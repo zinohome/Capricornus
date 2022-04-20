@@ -95,6 +95,7 @@ class CapricornusClient():
         request_body = {"username": self.username,"password": self.password}
         try:
             response = api.token.create(body = request_body)
+            log.logger.debug(response)
             if response.status_code == 200:
                 self._access_token = response.body['access_token']
                 self._token_type = response.body['token_type']
@@ -104,6 +105,7 @@ class CapricornusClient():
                 log.logger.error('Can not get user login at user_login() ... ')
         except Exception as exp:
             log.logger.error('Exception at user_login() %s ' % exp)
+            log.logger.error(traceback.format_exc())
         return login_pass
 
     def fetchusers(self):

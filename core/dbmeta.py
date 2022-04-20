@@ -633,9 +633,9 @@ if __name__ == '__main__':
     meta.gen_dbdirgramcanvas()
     meta.gen_ddl()
     meta.gen_models()
-    meta.gen_udfmodels()
+    #meta.gen_udfmodels()
     meta.gen_services()
-    meta.gen_udfservices()
+    #meta.gen_udfservices()
 
     '''
     log.logger.debug(otable.table2json())
