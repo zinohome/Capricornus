@@ -1,4 +1,4 @@
 #!/bin/bash
-IMGNAME=jointhero/Capricornus
-IMGVERSION=v1.1.2
+IMGNAME=jointhero/capricornus
+IMGVERSION=v2.1.1
 docker build -t $IMGNAME:$IMGVERSION . 
