@@ -21,3 +21,7 @@ pandas==1.4.2
 Crypto==1.4.1
 pycryptodome==3.14.1
 dataset==1.5.2
+slugify==0.0.1
+httpx==0.22.0
+status==0.2.5
+simple_rest_client==1.1.2
