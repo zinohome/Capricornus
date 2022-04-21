@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-bind = '0.0.0.0:8890'
+bind = '0.0.0.0:8843'
 backlog = 512
 chdir = '/opt/Capricornus'
 timeout = 300

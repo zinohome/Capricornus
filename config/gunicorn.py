@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-bind = '0.0.0.0:8890'
+bind = '0.0.0.0:8843'
 backlog = 512
 chdir = '/Users/zhangjun/PycharmProjects/Capricornus'
 timeout = 300
 worker_class = 'uvicorn.workers.UvicornWorker'
 workers = 1
 threads = 1
-loglevel = 'debug'
+loglevel = 'info'
 access_log_format = '%(t)s %(p)s %(h)s "%(r)s" %(s)s %(L)s %(b)s %(f)s" "%(a)s"'
 accesslog = "/Users/zhangjun/PycharmProjects/Capricornus/log/gunicorn_access.log"
 errorlog = "/Users/zhangjun/PycharmProjects/Capricornus/log/gunicorn_error.log"

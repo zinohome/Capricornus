@@ -14,7 +14,7 @@ mkcert -install && \
 mkdir -p /opt/Capricornus/log && \
 mkdir -p /opt/Capricornus/cert && \
 rm /opt/Capricornus/models/*.py && rm /opt/Capricornus/services/*.py && \
-mkcert -cert-file /opt/Capricornus/cert/cert.pem -key-file /opt/Capricornus/cert/cert-key.pem zinohome.com Capricornus.zinohome.com localhost 127.0.0.1 ::1 && \
+mkcert -cert-file /opt/Capricornus/cert/cert.pem -key-file /opt/Capricornus/cert/key.pem zinohome.com Capricornus.zinohome.com localhost 127.0.0.1 ::1 && \
 virtualenv venv && \
 . venv/bin/activate && \
 pip3 install -r requirements.txt && \
