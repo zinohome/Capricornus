@@ -8,6 +8,10 @@ uvicorn main:app --host 0.0.0.0 --port 8880 --no-server-header --no-date-header 
 
 gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app -b 0.0.0.0:8880
 
+gunicorn -k uvicorn.workers.UvicornWorker -w 3 -b 0.0.0.0:8880 -t 360 --reload main:app & 
+gunicorn -k uvicorn.workers.UvicornWorker -w 3 --certfile cert/cert.pem --keyfile cert/key.pem -b 0.0.0.0:8843 -t 360 --reload main:app 
+
+
 hypercorn main:app --certfile cert/cert.pem --keyfile cert/key.pem --bind 0.0.0.0:8843 --insecure-bind 0.0.0.0:8880  --worker-class trio 
 
 hypercorn --certfile cert.pem --keyfile key.pem --bind localhost:443 --insecure-bind localhost:80 module:app
