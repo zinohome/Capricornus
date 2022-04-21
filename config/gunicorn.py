@@ -12,7 +12,7 @@ loglevel = 'info'
 access_log_format = '%(t)s %(p)s %(h)s "%(r)s" %(s)s %(L)s %(b)s %(f)s" "%(a)s"'
 accesslog = "/opt/Capricornus/log/gunicorn_access.log"
 errorlog = "/opt/Capricornus/log/gunicorn_error.log"
-keyfile = "/opt/Capricornus/cert/cert-key.pem"
+keyfile = "/opt/Capricornus/cert/key.pem"
 certfile = "/opt/Capricornus/cert/cert.pem"
 """
 h          remote address
