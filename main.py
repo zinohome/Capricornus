@@ -49,6 +49,13 @@ log = log.Logger(level=cfg['Application_Config'].app_log_level)
 '''app_dir'''
 app_dir = os.path.dirname(os.path.abspath(__file__))
 
+'''services_model'''
+services_model = 0 #'Standalone'
+if cfg['Application_Config'].app_service_model == 'OpenReader':
+    services_model = 1 #'OpenReader'
+if cfg['Application_Config'].app_service_model == 'OpenWriter':
+    services_model = 2 #'OpenWriter'
+
 '''API prefix'''
 prefix = cfg['Application_Config'].app_prefix
 if prefix.startswith('/'):
@@ -220,29 +227,57 @@ async def get_dbdiagram():
     log.logger.debug('Access \'/_schema/dbdll\' : run in get_dbdiagram()')
     return dbmeta.DBMeta().response_dbdiagram("dbddl.sql")
 
-@app.get(prefix+"/_schema/database",
-         tags=["Schema"],
-         summary="Retrieve DbSchema Resources.",
-         description="By default, all tables are returned .",
-         )
-async def get_schema(current_user: security.User = Depends(security.get_current_active_user)):
-    log.logger.debug('Access \'/_schema/database\' : run in get_schema()')
-    return dbmeta.DBMeta().response_schema()
+if services_model >= 1:
+    @app.get(prefix + "/_schema/database",
+             tags=["Schema"],
+             summary="Retrieve DbSchema Resources.",
+             description="By default, all tables are returned .",
+             )
+    async def get_schema():
+        log.logger.debug('Access \'/_schema/database\' : run in get_schema()')
+        return dbmeta.DBMeta().response_schema()
 
-@app.get(prefix+"/_schema/_table/{table_name}",
-         tags=["Schema"],
-         summary="Retrieve table definition for the given table.",
-         description="This describes the table, its fields and indexes.",
-         )
-async def get_table_schema(table_name: str, current_user: security.User = Depends(security.get_current_active_user)):
-    log.logger.debug('Access \'/_schema/{table_name}\' : run in get_table_schema(), '
-                     'input data table_name: [%s]' % table_name)
-    if not dbmeta.DBMeta().check_table_schema(table_name):
-        raise HTTPException(
-            status_code=HTTP_404_NOT_FOUND,
-            detail='Table [ %s ] not found' % table_name
-        )
-    return dbmeta.DBMeta().response_table_schema(table_name)
+    @app.get(prefix + "/_schema/_table/{table_name}",
+             tags=["Schema"],
+             summary="Retrieve table definition for the given table.",
+             description="This describes the table, its fields and indexes.",
+             )
+    async def get_table_schema(table_name: str):
+        log.logger.debug('Access \'/_schema/{table_name}\' : run in get_table_schema(), '
+                         'input data table_name: [%s]' % table_name)
+        if not dbmeta.DBMeta().check_table_schema(table_name):
+            raise HTTPException(
+                status_code=HTTP_404_NOT_FOUND,
+                detail='Table [ %s ] not found' % table_name
+            )
+        return dbmeta.DBMeta().response_table_schema(table_name)
+
+else:
+    @app.get(prefix + "/_schema/database",
+             tags=["Schema"],
+             summary="Retrieve DbSchema Resources.",
+             description="By default, all tables are returned .",
+             )
+    async def get_schema(current_user: security.User = Depends(security.get_current_active_user)):
+        log.logger.debug('Access \'/_schema/database\' : run in get_schema()')
+        return dbmeta.DBMeta().response_schema()
+
+    @app.get(prefix + "/_schema/_table/{table_name}",
+             tags=["Schema"],
+             summary="Retrieve table definition for the given table.",
+             description="This describes the table, its fields and indexes.",
+             )
+    async def get_table_schema(table_name: str,
+                               current_user: security.User = Depends(security.get_current_active_user)):
+        log.logger.debug('Access \'/_schema/{table_name}\' : run in get_table_schema(), '
+                         'input data table_name: [%s]' % table_name)
+        if not dbmeta.DBMeta().check_table_schema(table_name):
+            raise HTTPException(
+                status_code=HTTP_404_NOT_FOUND,
+                detail='Table [ %s ] not found' % table_name
+            )
+        return dbmeta.DBMeta().response_table_schema(table_name)
+
 
 @app.get(prefix+"/_table/{table_name}",
          tags=["Data - Table Level"],
@@ -302,7 +337,6 @@ async def get_data(table_name: str,
         )
     dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
     dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-
     return getattr(dataservice, 'query_' + table_name.strip())(json.dumps(queryjson))
 
 @app.post(prefix+"/_table/_query/{table_name}",

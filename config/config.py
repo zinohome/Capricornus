@@ -24,6 +24,7 @@ class Application_Config(Config):
     app_description = config('app_description', default = 'Zero Code REST API for RDBMS')
     app_prefix = config('app_prefix', default = '/api/v2')
     app_cors_origins = config('app_cors_origins', default = '*')
+    app_service_model = config('app_service_model', default = 'Standalone') # Standalone|OpenReader|OpenWriter
     app_param_prefix = config('app_param_prefix', default = 'up_b_')
     app_force_generate_meta = config('app_force_generate_meta', default = True, cast = bool)
     app_log_level = config('app_log_level', default = 'INFO')

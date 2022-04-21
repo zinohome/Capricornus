@@ -6,6 +6,7 @@ app_description = Zero Code REST API for RDBMS
 app_param_prefix = up_b_
 app_prefix = /api/v1
 app_cors_origins = '*'
+app_service_model = Standalone
 app_force_generate_meta = True
 app_log_level = INFO
 app_user_func = True
