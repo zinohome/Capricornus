@@ -103,7 +103,7 @@
       visualization: '#fdf6e3',
       });
      */
-    fetch("/api/v1/_schema/dbdll")
+    fetch("/api/v2/_schema/dbdll")
       .then((response) => response.json())
       .then((data) => editor.loadSQLDDL(decodeURIComponent(escape(atob(data.content)))));
 
