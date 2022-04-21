@@ -20,5 +20,5 @@ virtualenv venv && \
 pip3 install -r requirements.txt && \
 pip3 uninstall -y simple_rest_client && \
 cd /opt/Capricornus && \
-cp /opt/Capricornus/docker/bd_build/50_start_capricornus.sh /etc/my_init.d/ && \
+cp /opt/Capricornus/docker/bd_build/50_start_capricornus-h.sh /etc/my_init.d/50_start_capricornus && \
 chmod 755 /etc/my_init.d/50_start_capricornus.sh
