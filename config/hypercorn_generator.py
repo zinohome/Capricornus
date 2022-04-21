@@ -37,9 +37,9 @@ else:
     web_concurrency = max(int(default_web_concurrency), 2)
     if use_max_workers:
         web_concurrency = min(web_concurrency, use_max_workers)
-accesslog_var = os.getenv("ACCESS_LOG", "/opt/Capricornus/log/gunicorn_access.log")
+accesslog_var = os.getenv("ACCESS_LOG", "/opt/Capricornus/log/hypercorn_access.log")
 use_accesslog = accesslog_var or None
-errorlog_var = os.getenv("ERROR_LOG", "/opt/Capricornus/log/gunicorn_error.log")
+errorlog_var = os.getenv("ERROR_LOG", "/opt/Capricornus/log/hypercorn_error.log")
 use_errorlog = errorlog_var or None
 keyfile_var = os.getenv("KEYFILE", "/opt/Capricornus/cert/key.pem")
 use_keyfile = keyfile_var or None

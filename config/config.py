@@ -22,7 +22,7 @@ class Application_Config(Config):
     app_name = config('app_name', default = 'Capricornus')
     app_version = config('app_version', default = 'v2.1.1')
     app_description = config('app_description', default = 'Zero Code REST API for RDBMS')
-    app_prefix = config('app_prefix', default = '/api/v1')
+    app_prefix = config('app_prefix', default = '/api/v2')
     app_cors_origins = config('app_cors_origins', default = '*')
     app_param_prefix = config('app_param_prefix', default = 'up_b_')
     app_force_generate_meta = config('app_force_generate_meta', default = True, cast = bool)
