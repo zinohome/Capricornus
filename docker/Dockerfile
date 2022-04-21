@@ -10,8 +10,7 @@ ENV ORACLE_HOME=/opt/instantclient
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/instantclient
 
 # ...put your own build instructions here...
-RUN mkdir -p /data
-RUN /bd_build/install.sh
+RUN mkdir -p /data && chmod 755 /bd_build/install.sh && RUN /bd_build/install.sh
 
 # Clean up APT when done.
 RUN /bd_build/cleanup.sh
