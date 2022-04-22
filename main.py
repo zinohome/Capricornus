@@ -87,6 +87,7 @@ async def startup_event():
         meta = dbmeta.DBMeta()
         meta.gen_models()
         meta.gen_services()
+    log.logger.info(cfg['Application_Config'].app_name + ' Started')
 
 @app.on_event("shutdown")
 def shutdown_event():
