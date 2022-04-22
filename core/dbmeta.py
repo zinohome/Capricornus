@@ -10,6 +10,7 @@
 #  @Software: Capricornus
 import os
 import pathlib
+import traceback
 
 from core import dbengine, tableschema
 from sqlalchemy import inspect, Table
@@ -170,6 +171,10 @@ class DBMeta(object):
                 jtbls = {}
                 jmeta['Tables'] = jtbls
                 table_list_set = set(toolkit.to_list(cfg['Schema_Config'].schema_fetch_tables))
+
+                log.logger.debug('Loading Logic PK from %s' % self.logic_pk_file)
+                with open(self.logic_pk_file, 'r') as logicpkfile:
+                    logicpk = json.loads(logicpkfile.read())
                 table_names = inspector.get_table_names()
                 if self.use_schema:
                     table_names = inspector.get_table_names(schema=self._schema)
@@ -193,7 +198,10 @@ class DBMeta(object):
                         if len(pk) > 0:
                             jtbl['PrimaryKeys'] = pk['constrained_columns']
                         else:
-                            jtbl['PrimaryKeys'] = []
+                            if table_name in logicpk['Tables'].keys():
+                                jtbl['PrimaryKeys'] = logicpk['Tables'][table_name]['PrimaryKeys']
+                            else:
+                                jtbl['PrimaryKeys'] = []
                         jtbl['Indexes'] = inspector.get_indexes(table_name)
                         if self.use_schema:
                             jtbl['Indexes'] = inspector.get_indexes(table_name, schema=self._schema)
@@ -264,6 +272,7 @@ class DBMeta(object):
                 raise Exception('Can not get metadata at gen_schema()')
         except Exception as exp:
             log.logger.error('Exception at gen_schema() %s ' % exp)
+            traceback.print_exc()
 
     def load_schema(self):
         log.logger.debug('Loading schema from %s' % self.schema_file)
