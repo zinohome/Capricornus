@@ -38,7 +38,7 @@ class {{ name }}(SQLModel, table=True):
         {% endif %}
     {% else %}
         {% if column.primary_key | int > 0 %}
-    {{column.name}}: {{column.pythonType}} = Field(default=None, primary_key=True)
+    {{column.name}}: Optional[{{column.pythonType}}] = Field(default=None, primary_key=True)
         {% else %}
     {{column.name}}: {{column.pythonType}} = Field(sa_column=Column("{{ column.name }}", default={{column.default}}, primary_key=False))
         {% endif %}
