@@ -467,6 +467,7 @@ class DBMeta(object):
             for tbl in tbls:
                 dtable = self.gettable(tbl)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
+                log.logger.debug("dtable.table2json(): %s" % dtable.table2json())
                 template = env.get_template('sqlmodel_tmpl.py')
                 gencode = template.render(dtable.table2json())
                 #log.logger.debug(gencode)
@@ -626,7 +627,7 @@ if __name__ == '__main__':
     log.logger.debug(cfg['Database_Config'].db_schema)
     meta = DBMeta()
     metadata = meta.metadata
-    otable = meta.gettable('Customers')
+    #otable = meta.gettable('ogdb')
     log.logger.debug(meta.get_tables())
     log.logger.debug(meta.get_views())
     meta.gen_dbdirgram()
