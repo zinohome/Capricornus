@@ -145,6 +145,7 @@ def puttabledata(tablename):
         pklist.append(requstdict[pk])
     pkname = ",".join(pknamelist)
     idvalue = "-".join(list(map(str, pklist)))
+
     nc = restclient.CapricornusClient(session['username'],
                                       cryptutil.decrypt(cfg['Admin_Config'].SECRET_KEY, session['password']))
     if nc.token_expired:

@@ -142,7 +142,7 @@ class CapricornusClient():
             try:
                 res = api._resources[api.correct_attribute_name(resource_name)]
                 #res = api._resources[resource_name]
-                log.logger.debug(res.actions)
+                #log.logger.debug(res.actions)
                 #log.logger.debug(res.get_action_full_url(action))
                 #log.logger.debug(res.get_action(action))
                 func = getattr(res,action)
