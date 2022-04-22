@@ -193,6 +193,10 @@ class DBMeta(object):
                             cdict={}
                             for key, value in column.items():
                                 cdict[key] = value.__str__()
+                            if column['name'] in jtbl['PrimaryKeys']:
+                                cdict['primary_key'] = 1
+                            else:
+                                cdict['primary_key'] = 0
                             cdict['pythonType'] = cptypedict[cdict['name']]
                             jtbl['Columns'].append(cdict)
                         jtbl['Dict'] = json.loads(json.dumps(user_table.__dict__,
@@ -232,7 +236,11 @@ class DBMeta(object):
                             vdict = {}
                             for key, value in vcolumn.items():
                                 vdict[key] = value.__str__()
-                            cdict['pythonType'] = cptypedict[vdict['name']]
+                            if column['name'] in vtbl['PrimaryKeys']:
+                                vdict['primary_key'] = 1
+                            else:
+                                vdict['primary_key'] = 0
+                            vdict['pythonType'] = cptypedict[vdict['name']]
                             vtbl['Columns'].append(vdict)
                         vtbl['Dict'] = json.loads(
                             json.dumps(user_view.__dict__, indent=4, sort_keys=True, default=str))
@@ -467,7 +475,6 @@ class DBMeta(object):
             for tbl in tbls:
                 dtable = self.gettable(tbl)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
-                log.logger.debug("dtable.table2json(): %s" % dtable.table2json())
                 template = env.get_template('sqlmodel_tmpl.py')
                 gencode = template.render(dtable.table2json())
                 #log.logger.debug(gencode)
