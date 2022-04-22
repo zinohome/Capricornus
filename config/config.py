@@ -41,6 +41,7 @@ class Application_Config(Config):
 
 class Schema_Config(Config):
     schema_cache_enabled = config('schema_cache_enabled', default = True, cast = bool)
+    schema_model_refresh = config('schema_model_refresh', default = False, cast = bool)
     schema_cache_filename = config('schema_cache_filename', default = 'capricornus_metadata')
     schema_db_metafile = config('schema_db_metafile', default = 'metadata.json')
     schema_db_logicpkfile = config('schema_db_logicpkfile', default = 'logicpk.json')
@@ -85,6 +86,7 @@ class Admin_Config(Config):
     SESSION_COOKIE_HTTPONLY = config('SESSION_COOKIE_HTTPONLY', default = True, cast = bool)
     REMEMBER_COOKIE_HTTPONLY = config('REMEMBER_COOKIE_HTTPONLY', default = True, cast = bool)
     REMEMBER_COOKIE_DURATION = config('REMEMBER_COOKIE_DURATION', default = 3600, cast = int)
+    admin_ignore_primary_key = config('admin_ignore_primary_key', default = True, cast = bool)
 
 # Load all possible configurations
 app_config = {

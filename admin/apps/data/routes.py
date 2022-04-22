@@ -115,8 +115,9 @@ def posttabledata(tablename):
     if (not nc.token_expired) and (nc.access_token is not None):
         sysdbmeta = dbmeta.DBMeta()
         pks = sysdbmeta.get_table_primary_keys(tablename)
-        for pk in pks:
-            del requstdict[pk]
+        if cfg['Admin_Config'].admin_ignore_primary_key:
+            for pk in pks:
+                del requstdict[pk]
         requestlist =[]
         requestlist.append(requstdict)
         restbodyjson = {"data":requestlist}

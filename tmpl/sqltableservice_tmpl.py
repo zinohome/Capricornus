@@ -89,7 +89,8 @@ class {{ name }}Service(object):
             with Session(engine) as session:
                 session.add(customer)
                 session.commit()
-                #session.refresh(customer)
+                if cfg['Schema_Config'].schema_model_refresh:
+                    session.refresh(customer)
                 pks = {{ name }}.getPrimaryKeys({{ name }})
                 returnjson = {}
                 for pk in pks:
@@ -142,7 +143,8 @@ class {{ name }}Service(object):
             with Session(engine) as session:
                 session.add(customer)
                 session.commit()
-                #session.refresh(customer)
+                if cfg['Schema_Config'].schema_model_refresh:
+                    session.refresh(customer)
                 return customer
         except Exception as e:
             log.logger.error('Exception at update_{{ name }}(): %s ' % e)
@@ -167,7 +169,8 @@ class {{ name }}Service(object):
                         modcustomer.__setattr__(field.name, updatejson[field.name])
                 session.add(modcustomer)
                 session.commit()
-                #session.refresh(modcustomer)
+                if cfg['Schema_Config'].schema_model_refresh:
+                    session.refresh(modcustomer)
                 return modcustomer
         except Exception as e:
             log.logger.error('Exception at update_{{ name }}_byjson(): %s ' % e)
