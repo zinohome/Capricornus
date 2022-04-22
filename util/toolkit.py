@@ -162,10 +162,8 @@ def validQueryJson(jsonstr):
 def uappend(lststr):
     return config.app_config['Application_Config'].app_param_prefix+'{}'.format(lststr)
 
-
 def uappendlist(slist):
     return list(map(uappend, slist))
-
 
 def gen_dburi():
     db = {'drivername': cfg['Database_Config'].db_drivername,

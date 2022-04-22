@@ -183,7 +183,6 @@
             });
         },
         "columns": [
-          { data: "include", title: "Include", type: "checkbox", altEditor: "true"},
           {% for column in meta.columns %}
           { data: "{{ column['name'] }}", title: "{{ column['name']|capitalize }}"}{{ ", " if not loop.last else "" }}
           {% endfor %}
