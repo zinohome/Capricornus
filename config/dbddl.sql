@@ -3,7 +3,7 @@ CREATE TABLE `ogdb` (
 	`ogdb_id` VARCHAR(100) COLLATE utf8mb4_general_ci NOT NULL, 
 	`ogdb_name` VARCHAR(100) COLLATE utf8mb4_general_ci NOT NULL, 
 	PRIMARY KEY  `(ogdb_id`) 
-)ENGINE=InnoDB COLLATE utf8mb4_general_ci DEFAULT CHARSET=utf8mb4
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci
 
 
 CREATE TABLE `ogdbuser` (
@@ -12,7 +12,7 @@ CREATE TABLE `ogdbuser` (
 	`ogdbuser_password` VARCHAR(100) COLLATE utf8mb4_general_ci NOT NULL, 
 	`ogdbuser_active` TINYINT(1) NOT NULL, 
 	`ogdb_id` VARCHAR(100) COLLATE utf8mb4_general_ci NOT NULL
-)ENGINE=InnoDB COLLATE utf8mb4_general_ci DEFAULT CHARSET=utf8mb4
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci
 
 
 CREATE TABLE `sysuser` (
@@ -22,5 +22,5 @@ CREATE TABLE `sysuser` (
 	`nickname` VARCHAR(100) COLLATE utf8mb4_general_ci NOT NULL, 
 	`userrole` VARCHAR(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user', 
 	PRIMARY KEY  `(userid`) 
-)ENGINE=InnoDB COLLATE utf8mb4_general_ci DEFAULT CHARSET=utf8mb4
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci
 

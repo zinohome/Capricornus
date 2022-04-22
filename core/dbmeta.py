@@ -195,7 +195,7 @@ class DBMeta(object):
                         pk = inspector.get_pk_constraint(table_name)
                         if self.use_schema:
                             pk = inspector.get_pk_constraint(table_name, schema=self._schema)
-                        if len(pk) > 0:
+                        if len(pk['constrained_columns']) > 0:
                             jtbl['PrimaryKeys'] = pk['constrained_columns']
                         else:
                             if table_name in logicpk['Tables'].keys():

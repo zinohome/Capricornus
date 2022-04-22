@@ -6,13 +6,6 @@
       "PrimaryKeys": [
         "ogdbuser_id"
       ]
-    },
-    "ogdbuser2": {
-      "Name": "ogdbuser2",
-      "Type": "table",
-      "PrimaryKeys": [
-        "ogdbuser_id"
-      ]
     }
   }
 }
