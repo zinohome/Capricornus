@@ -474,6 +474,7 @@ class DBMeta(object):
             tbls = self.get_tables()
             for tbl in tbls:
                 dtable = self.gettable(tbl)
+                log.logger.debug("Generate model for table: %s" % dtable.name)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
                 template = env.get_template('sqlmodel_tmpl.py')
                 gencode = template.render(dtable.table2json())
@@ -488,6 +489,7 @@ class DBMeta(object):
             views = self.get_views()
             for view in views:
                 dview = self.gettable(view)
+                log.logger.debug("Generate model for view: %s" % dview.name)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
                 template = env.get_template('sqlmodel_tmpl.py')
                 gencode = template.render(dview.table2json())
@@ -509,6 +511,7 @@ class DBMeta(object):
             tbls = self.get_tables()
             for tbl in tbls:
                 dtable = self.gettable(tbl)
+                log.logger.debug("Generate udf model for table: %s" % dtable.name)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
                 template = env.get_template('sqlmodel_tmpl.py')
                 gencode = template.render(dtable.table2json())
@@ -523,6 +526,7 @@ class DBMeta(object):
             views = self.get_views()
             for view in views:
                 dview = self.gettable(view)
+                log.logger.debug("Generate udf model for view: %s" % dview.name)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
                 template = env.get_template('sqlmodel_tmpl.py')
                 gencode = template.render(dview.table2json())
@@ -544,6 +548,7 @@ class DBMeta(object):
             tbls = self.get_tables()
             for tbl in tbls:
                 dtable = self.gettable(tbl)
+                log.logger.debug("Generate service for table: %s" % dtable.name)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
                 template = env.get_template('sqltableservice_tmpl.py')
                 gencode = template.render(dtable.table2json())
@@ -558,6 +563,7 @@ class DBMeta(object):
             views = self.get_views()
             for view in views:
                 dview = self.gettable(view)
+                log.logger.debug("Generate service for view: %s" % dview.name)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
                 template = env.get_template('sqlviewservice_tmpl.py')
                 gencode = template.render(dview.table2json())
@@ -578,6 +584,7 @@ class DBMeta(object):
             tbls = self.get_tables()
             for tbl in tbls:
                 dtable = self.gettable(tbl)
+                log.logger.debug("Generate udf service for table: %s" % dtable.name)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
                 template = env.get_template('sqltableservice_tmpl.py')
                 gencode = template.render(dtable.table2json())
@@ -592,6 +599,7 @@ class DBMeta(object):
             views = self.get_views()
             for view in views:
                 dview = self.gettable(view)
+                log.logger.debug("Generate udf service for view: %s" % dview.name)
                 env = Environment(loader=FileSystemLoader(tmplpath), trim_blocks=True, lstrip_blocks=True)
                 template = env.get_template('sqlviewservice_tmpl.py')
                 gencode = template.render(dview.table2json())

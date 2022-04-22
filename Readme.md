@@ -2,7 +2,7 @@
 
 REST API autogeneration tool for RDBMS base on fastapi and SQLAlchemy
 
-uvicorn main:app --host 0.0.0.0 --port 8880 --reload --no-server-header --no-date-header --workers 1
+uvicorn main:app --host 0.0.0.0 --port 8890 --reload --no-server-header --no-date-header --workers 1
 
 uvicorn main:app --host 0.0.0.0 --port 8880 --no-server-header --no-date-header --workers 2
 

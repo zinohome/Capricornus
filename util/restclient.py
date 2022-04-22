@@ -247,6 +247,14 @@ if __name__ == '__main__':
         nc.renew_token()
     if ( not nc.token_expired ) and ( nc.access_token is not None ):
         log.logger.debug(nc.fetchusers())
+        ncdb = nc.fetch('database', '_schema')
+        log.logger.debug(ncdb)
+        ncmeta = nc.fetch('ogdbuser', '_schema/_table')
+        log.logger.debug(ncmeta)
+        resultstr = nc.fetch('ogdbuser', '_table', None, 0, 5, True)
+        log.logger.debug(resultstr)
+        '''
+        log.logger.debug(nc.fetchusers())
         ncdb = nc.fetch('database','_schema')
         log.logger.debug(ncdb)
         ncmeta = nc.fetch('Brands', '_schema/_table')
@@ -273,10 +281,4 @@ if __name__ == '__main__':
         ids = [8]
         log.logger.debug(",".join(idks))
         log.logger.debug("-".join(list(map(str, ids))))
-        #resultstr = nc.post('zinopara', '_table', json.dumps({"fieldvalue":"{'id': '229', 'type': '222', 'creatorid': '222', 'json': '222', 'json_updates': '2222'}"}))
-        #log.logger.debug(resultstr)
-
-        # log.logger.debug(dir(resultstr))
-        # df = nc.toDataFrame(resultstr,'data')
-        # log.logger.debug(df.to_html(table_id="example", classes="table table-bordered table-striped"))
-
+        '''
