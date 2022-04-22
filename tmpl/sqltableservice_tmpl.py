@@ -10,6 +10,7 @@
 #  @Software: Capricornus
 import collections
 import distutils
+import traceback
 
 import simplejson as json
 from sqlalchemy import func
@@ -62,6 +63,7 @@ class {{ name }}Service(object):
                 return results.all()
         except Exception as e:
             log.logger.error('Exception at getall_{{ name }}(): %s ' % e)
+            traceback.print_exc()
             return None
         finally:
             session.close()
@@ -74,6 +76,7 @@ class {{ name }}Service(object):
                 return results.one()[0]
         except Exception as e:
             log.logger.error('Exception at get_{{ name }}_count(): %s ' % e)
+            traceback.print_exc()
             return None
         finally:
             session.close()
@@ -92,6 +95,7 @@ class {{ name }}Service(object):
                 return returnjson
         except Exception as e:
             log.logger.error('Exception at create_{{ name }}(): %s ' % e)
+            traceback.print_exc()
             return None
         finally:
             session.close()
@@ -109,6 +113,7 @@ class {{ name }}Service(object):
             return returnjson
         except Exception as e:
             log.logger.error('Exception at batch_create_{{ name }}(): %s ' % e)
+            traceback.print_exc()
             return None
 
     def get_{{ name }}_byid(self, idstr):
@@ -121,6 +126,7 @@ class {{ name }}Service(object):
                 return result
         except Exception as e:
             log.logger.error('Exception at get_{{ name }}_byid(): %s ' % e)
+            traceback.print_exc()
             return None
         finally:
             session.close()
@@ -135,6 +141,7 @@ class {{ name }}Service(object):
                 return customer
         except Exception as e:
             log.logger.error('Exception at update_{{ name }}(): %s ' % e)
+            traceback.print_exc()
             return None
         finally:
             session.close()
@@ -158,6 +165,7 @@ class {{ name }}Service(object):
                 return modcustomer
         except Exception as e:
             log.logger.error('Exception at update_{{ name }}_byjson(): %s ' % e)
+            traceback.print_exc()
             return None
         finally:
             session.close()
@@ -173,6 +181,7 @@ class {{ name }}Service(object):
             return returnjson
         except Exception as e:
             log.logger.error('Exception at batch_update_{{ name }}_byjson(): %s ' % e)
+            traceback.print_exc()
             return None
 
     def delete_{{ name }}_byid(self, idstr):
@@ -187,6 +196,7 @@ class {{ name }}Service(object):
                 return True
         except Exception as e:
             log.logger.error('Exception at delete_{{ name }}_byid(): %s ' % e)
+            traceback.print_exc()
             return False
         finally:
             session.close()
@@ -289,6 +299,7 @@ class {{ name }}Service(object):
                     return returnjson
             except Exception as e:
                 log.logger.error('Exception at query_{{ name }}(): %s ' % e)
+                traceback.print_exc()
                 return None
             finally:
                 session.close()
