@@ -241,10 +241,13 @@ class DBMeta(object):
                         pk = inspector.get_pk_constraint(view_name)
                         if self.use_schema:
                             pk = inspector.get_pk_constraint(view_name, schema=self._schema)
-                        if len(pk) > 0:
+                        if len(pk['constrained_columns']) > 0:
                             vtbl['PrimaryKeys'] = pk['constrained_columns']
                         else:
-                            vtbl['PrimaryKeys'] = []
+                            if view_name in logicpk['Tables'].keys():
+                                vtbl['PrimaryKeys'] = logicpk['Tables'][view_name]['PrimaryKeys']
+                            else:
+                                vtbl['PrimaryKeys'] = []
                         vtbl['Indexes'] = inspector.get_indexes(view_name)
                         if self.use_schema:
                             vtbl['Indexes'] = inspector.get_indexes(view_name, schema=self._schema)
