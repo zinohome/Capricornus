@@ -12,6 +12,8 @@
 
 import os
 import json
+import traceback
+
 from util import log
 from config import config
 
@@ -41,6 +43,8 @@ class Users(object):
                 self.users = json.loads(usersfile.read())
         except Exception as err:
             log.logger.error('Exception load Users file %s ' % err)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
     def deluser(self,username):
         auth_dir = os.path.dirname(os.path.abspath(__file__))
@@ -50,6 +54,8 @@ class Users(object):
                 self.users.pop(username)
         except Exception as err:
             log.logger.error('Exception load Users file %s ' % err)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
     def writeback(self):
         auth_dir = os.path.dirname(os.path.abspath(__file__))
@@ -58,6 +64,8 @@ class Users(object):
                 json.dump(self.users,usersfile,indent=4,ensure_ascii=False)
         except Exception as err:
             log.logger.error('Exception writeback Users file %s ' % err)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
     def reload(self):
         auth_dir = os.path.dirname(os.path.abspath(__file__))
@@ -66,6 +74,8 @@ class Users(object):
                 self.users = json.loads(usersfile.read())
         except Exception as err:
             log.logger.error('Exception reload Users file %s ' % err)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
 
 if __name__ == '__main__':

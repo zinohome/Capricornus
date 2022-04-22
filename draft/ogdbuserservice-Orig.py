@@ -63,7 +63,8 @@ class ogdbuserService(object):
                 return results.all()
         except Exception as e:
             log.logger.error('Exception at getall_ogdbuser(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
         finally:
             session.close()
@@ -76,7 +77,8 @@ class ogdbuserService(object):
                 return results.one()[0]
         except Exception as e:
             log.logger.error('Exception at get_ogdbuser_count(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
         finally:
             session.close()
@@ -95,7 +97,8 @@ class ogdbuserService(object):
                 return returnjson
         except Exception as e:
             log.logger.error('Exception at create_ogdbuser(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
         finally:
             session.close()
@@ -113,7 +116,8 @@ class ogdbuserService(object):
             return returnjson
         except Exception as e:
             log.logger.error('Exception at batch_create_ogdbuser(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
 
     def get_ogdbuser_byid(self, idstr):
@@ -126,7 +130,8 @@ class ogdbuserService(object):
                 return result
         except Exception as e:
             log.logger.error('Exception at get_ogdbuser_byid(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
         finally:
             session.close()
@@ -141,7 +146,8 @@ class ogdbuserService(object):
                 return customer
         except Exception as e:
             log.logger.error('Exception at update_ogdbuser(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
         finally:
             session.close()
@@ -165,7 +171,8 @@ class ogdbuserService(object):
                 return modcustomer
         except Exception as e:
             log.logger.error('Exception at update_ogdbuser_byjson(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
         finally:
             session.close()
@@ -181,7 +188,8 @@ class ogdbuserService(object):
             return returnjson
         except Exception as e:
             log.logger.error('Exception at batch_update_ogdbuser_byjson(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
 
     def delete_ogdbuser_byid(self, idstr):
@@ -196,7 +204,8 @@ class ogdbuserService(object):
                 return True
         except Exception as e:
             log.logger.error('Exception at delete_ogdbuser_byid(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return False
         finally:
             session.close()
@@ -299,7 +308,8 @@ class ogdbuserService(object):
                     return returnjson
             except Exception as e:
                 log.logger.error('Exception at query_ogdbuser(): %s ' % e)
-                traceback.print_exc()
+                if cfg['Application_Config'].app_exception_detail:
+                    traceback.print_exc()
                 return None
             finally:
                 session.close()

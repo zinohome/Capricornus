@@ -297,7 +297,8 @@ class DBMeta(object):
                 raise Exception('Can not get metadata at gen_schema()')
         except Exception as exp:
             log.logger.error('Exception at gen_schema() %s ' % exp)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
     def load_schema(self):
         log.logger.debug('Loading schema from %s' % self.schema_file)
@@ -417,6 +418,8 @@ class DBMeta(object):
                           sort_keys=False, indent=4, ensure_ascii=False, encoding='utf-8')
         except Exception as exp:
             log.logger.error('Exception at gen_dbdirgram() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
 
     def gen_dbdirgramcanvas(self):
@@ -438,6 +441,8 @@ class DBMeta(object):
                           sort_keys=False, indent=4, ensure_ascii=False, encoding='utf-8')
         except Exception as exp:
             log.logger.error('Exception at gen_dbdirgramcanvas() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
 
     def gen_ddl(self):
@@ -509,6 +514,8 @@ class DBMeta(object):
                 raise Exception('Can not get metadata at gen_ddl()')
         except Exception as exp:
             log.logger.error('Exception at gen_ddl() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
 
     def gen_models(self):
@@ -531,6 +538,8 @@ class DBMeta(object):
                     gencodefile.close()
         except Exception as exp:
             log.logger.error('Exception at gen_models() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
         try:
             views = self.get_views()
             for view in views:
@@ -546,6 +555,8 @@ class DBMeta(object):
                     gencodefile.close()
         except Exception as exp:
             log.logger.error('Exception at gen_models() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
 
     def gen_udfmodels(self):
@@ -568,6 +579,8 @@ class DBMeta(object):
                     gencodefile.close()
         except Exception as exp:
             log.logger.error('Exception at gen_models() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
         try:
             views = self.get_views()
             for view in views:
@@ -583,6 +596,8 @@ class DBMeta(object):
                     gencodefile.close()
         except Exception as exp:
             log.logger.error('Exception at gen_models() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
 
     def gen_services(self):
@@ -605,6 +620,8 @@ class DBMeta(object):
                     gencodefile.close()
         except Exception as exp:
             log.logger.error('Exception at gen_services() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
         try:
             views = self.get_views()
             for view in views:
@@ -620,6 +637,8 @@ class DBMeta(object):
                     gencodefile.close()
         except Exception as exp:
             log.logger.error('Exception at gen_services() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
     def gen_udfservices(self):
         basepath = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
@@ -641,6 +660,8 @@ class DBMeta(object):
                     gencodefile.close()
         except Exception as exp:
             log.logger.error('Exception at gen_services() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
         try:
             views = self.get_views()
             for view in views:
@@ -656,6 +677,8 @@ class DBMeta(object):
                     gencodefile.close()
         except Exception as exp:
             log.logger.error('Exception at gen_services() %s ' % exp)
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
     def response_dbdiagram(self, filename, canvasonly=False):
         basepath = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))

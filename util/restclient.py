@@ -86,7 +86,8 @@ class CapricornusClient():
                 raise Exception('Can not get renew_token at renew_token()')
         except Exception as exp:
             log.logger.error('Exception at renew_token() %s ' % exp)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
     def user_login(self):
         login_pass = False
@@ -105,7 +106,8 @@ class CapricornusClient():
                 log.logger.error('Can not get user login at user_login() ... ')
         except Exception as exp:
             log.logger.error('Exception at user_login() %s ' % exp)
-            log.logger.error(traceback.format_exc())
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
         return login_pass
 
     def fetchusers(self):
@@ -118,7 +120,8 @@ class CapricornusClient():
             return response.body
         except Exception as exp:
             log.logger.error('Exception at fetchusers() %s ' % exp)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
 
     def fetch(self, resource_name, url_prefix='', body=None, offset=None, limit=None, withcounters=None):
         action = 'list'
@@ -152,7 +155,8 @@ class CapricornusClient():
                 return res
             except Exception as exp:
                 log.logger.error('Exception at fetch() %s ' % exp)
-                traceback.print_exc()
+                if cfg['Application_Config'].app_exception_detail:
+                    traceback.print_exc()
 
     def post(self, resource_name, url_prefix='', body=None):
         log.logger.debug(body)
@@ -178,7 +182,8 @@ class CapricornusClient():
                 return res
             except Exception as exp:
                 log.logger.error('Exception at post() %s ' % exp)
-                traceback.print_exc()
+                if cfg['Application_Config'].app_exception_detail:
+                    traceback.print_exc()
 
 
     def put(self, resource_name, url_prefix='', body=None, idvalue=None):
@@ -205,7 +210,8 @@ class CapricornusClient():
                 return res
             except Exception as exp:
                 log.logger.error('Exception at post() %s ' % exp)
-                traceback.print_exc()
+                if cfg['Application_Config'].app_exception_detail:
+                    traceback.print_exc()
 
 
     def deletebyid(self, resource_name, url_prefix='', idfield=None, idvalue=None):
@@ -233,7 +239,8 @@ class CapricornusClient():
                 return res
             except Exception as exp:
                 log.logger.error('Exception at deletebyid() %s ' % exp)
-                traceback.print_exc()
+                if cfg['Application_Config'].app_exception_detail:
+                    traceback.print_exc()
 
     def toDataFrame(self, jsonobj, attbname):
         dataframe = json_normalize(jsonobj[attbname])

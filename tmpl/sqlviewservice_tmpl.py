@@ -63,7 +63,8 @@ class {{ name }}Service(object):
                 return results.all()
         except Exception as e:
             log.logger.error('Exception at getall_{{ name }}(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
         finally:
             session.close()
@@ -76,7 +77,8 @@ class {{ name }}Service(object):
                 return results.one()[0]
         except Exception as e:
             log.logger.error('Exception at get_{{ name }}_count(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
         finally:
             session.close()
@@ -91,7 +93,8 @@ class {{ name }}Service(object):
                 return result
         except Exception as e:
             log.logger.error('Exception at get_{{ name }}_byid(): %s ' % e)
-            traceback.print_exc()
+            if cfg['Application_Config'].app_exception_detail:
+                traceback.print_exc()
             return None
         finally:
             session.close()
@@ -194,7 +197,8 @@ class {{ name }}Service(object):
                     return returnjson
             except Exception as e:
                 log.logger.error('Exception at query_{{ name }}(): %s ' % e)
-                traceback.print_exc()
+                if cfg['Application_Config'].app_exception_detail:
+                    traceback.print_exc()
                 return None
             finally:
                 session.close()
