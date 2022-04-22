@@ -9,6 +9,8 @@
 #  @Email   : ibmzhangjun@139.com
 #  @Software: Capricornus
 import os
+import pathlib
+
 from core import dbengine, tableschema
 from sqlalchemy import inspect, Table
 from sqlalchemy.schema import MetaData,CreateTable
@@ -104,8 +106,10 @@ class DBMeta(object):
         basepath = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
         apppath = os.path.abspath(os.path.join(basepath, os.pardir))
         configpath = os.path.abspath(os.path.join(apppath, 'config'))
-        metafilepath = os.path.abspath(os.path.join(configpath, cfg['Schema_Config'].schema_db_metafile))
-        return metafilepath
+        lpkfilepath = os.path.abspath(os.path.join(configpath, cfg['Schema_Config'].schema_db_logicpkfile))
+        if not os.access(lpkfilepath, os.F_OK):
+            pathlib.Path(lpkfilepath).touch()
+        return lpkfilepath
 
     def load_metadata(self):
         engine = dbengine.DBEngine().connect()
