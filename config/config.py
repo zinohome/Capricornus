@@ -43,6 +43,7 @@ class Schema_Config(Config):
     schema_cache_enabled = config('schema_cache_enabled', default = True, cast = bool)
     schema_cache_filename = config('schema_cache_filename', default = 'capricornus_metadata')
     schema_db_metafile = config('schema_db_metafile', default = 'metadata.json')
+    schema_db_logicpkfile = config('schema_db_logicpkfile', default = 'logicpk.json')
     schema_fetch_all_table = config('schema_fetch_all_table', default = True, cast = bool)
     schema_fetch_tables = config('schema_fetch_tables', default = '[test,faultmsg]')
 

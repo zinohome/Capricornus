@@ -1,0 +1,9 @@
+"Tables":{
+        "ogdbuser": {
+          "Name": "ogdbuser",
+          "Type":"table",
+          "PrimaryKeys":[
+            "ogdbuser_id"
+          ]
+        }
+}

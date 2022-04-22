@@ -99,6 +99,14 @@ class DBMeta(object):
         metafilepath = os.path.abspath(os.path.join(configpath, cfg['Schema_Config'].schema_db_metafile))
         return metafilepath
 
+    @property
+    def logic_pk_file(self):
+        basepath = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+        apppath = os.path.abspath(os.path.join(basepath, os.pardir))
+        configpath = os.path.abspath(os.path.join(apppath, 'config'))
+        metafilepath = os.path.abspath(os.path.join(configpath, cfg['Schema_Config'].schema_db_metafile))
+        return metafilepath
+
     def load_metadata(self):
         engine = dbengine.DBEngine().connect()
         cached_metadata = None
