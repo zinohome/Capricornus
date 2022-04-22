@@ -24,6 +24,7 @@ schema_cache_enabled = True
 schema_cache_filename = capricornus_metadata
 schema_db_metafile = metadata.json
 schema_db_logicpkfile = logicpk.json
+schema_db_logicpkneedfile = logicpk-need.json
 schema_fetch_all_table = True
 schema_fetch_tables = table1, table2
 ;query settings =

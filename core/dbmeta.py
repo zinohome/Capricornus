@@ -112,6 +112,14 @@ class DBMeta(object):
             pathlib.Path(lpkfilepath).touch()
         return lpkfilepath
 
+    @property
+    def logic_pk_nd_file(self):
+        basepath = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+        apppath = os.path.abspath(os.path.join(basepath, os.pardir))
+        configpath = os.path.abspath(os.path.join(apppath, 'config'))
+        lpkndfilepath = os.path.abspath(os.path.join(configpath, cfg['Schema_Config'].schema_db_logicpkneedfile))
+        return lpkndfilepath
+
     def load_metadata(self):
         engine = dbengine.DBEngine().connect()
         cached_metadata = None
@@ -170,6 +178,9 @@ class DBMeta(object):
                 jmeta['Schema'] = cfg['Database_Config'].db_schema
                 jtbls = {}
                 jmeta['Tables'] = jtbls
+                ljmeta = {}
+                ljtbls = {}
+                ljmeta['Tables'] = ljtbls
                 table_list_set = set(toolkit.to_list(cfg['Schema_Config'].schema_fetch_tables))
 
                 log.logger.debug('Loading Logic PK from %s' % self.logic_pk_file)
@@ -202,6 +213,11 @@ class DBMeta(object):
                                 jtbl['PrimaryKeys'] = logicpk['Tables'][table_name]['PrimaryKeys']
                             else:
                                 jtbl['PrimaryKeys'] = []
+                                ljtbl = {}
+                                ljtbls[table_name] = ljtbl
+                                ljtbl['Name'] = table_name
+                                ljtbl['Type'] = 'table'
+                                ljtbl['PrimaryKeys'] = []
                         jtbl['Indexes'] = inspector.get_indexes(table_name)
                         if self.use_schema:
                             jtbl['Indexes'] = inspector.get_indexes(table_name, schema=self._schema)
@@ -248,6 +264,11 @@ class DBMeta(object):
                                 vtbl['PrimaryKeys'] = logicpk['Tables'][view_name]['PrimaryKeys']
                             else:
                                 vtbl['PrimaryKeys'] = []
+                                lvtbl = {}
+                                ljtbls[view_name] = lvtbl
+                                lvtbl['Name'] = view_name
+                                lvtbl['Type'] = 'view'
+                                lvtbl['PrimaryKeys'] = []
                         vtbl['Indexes'] = inspector.get_indexes(view_name)
                         if self.use_schema:
                             vtbl['Indexes'] = inspector.get_indexes(view_name, schema=self._schema)
