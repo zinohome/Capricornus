@@ -235,8 +235,7 @@ class DBMeta(object):
                                 cdict['primary_key'] = 0
                             cdict['pythonType'] = cptypedict[cdict['name']]
                             jtbl['Columns'].append(cdict)
-                        jtbl['Dict'] = json.loads(json.dumps(user_table.__dict__,
-                                                             indent=4, sort_keys=True, default=str))
+                        #jtbl['Dict'] = json.loads(json.dumps(user_table.__dict__,indent=4, sort_keys=True, default=str))
                 view_names = inspector.get_view_names()
                 if self.use_schema:
                     view_names = inspector.get_view_names(schema=self._schema)
@@ -286,10 +285,12 @@ class DBMeta(object):
                                 vdict['primary_key'] = 0
                             vdict['pythonType'] = cptypedict[vdict['name']]
                             vtbl['Columns'].append(vdict)
-                        vtbl['Dict'] = json.loads(
-                            json.dumps(user_view.__dict__, indent=4, sort_keys=True, default=str))
+                        #vtbl['Dict'] = json.loads(json.dumps(user_view.__dict__, indent=4, sort_keys=True, default=str))
                 with open(self.schema_file, 'w') as jsonfile:
                     json.dump(jmeta, jsonfile, separators=(',', ':'),
+                              sort_keys=False, indent=4, ensure_ascii=False, encoding='utf-8')
+                with open(self.logic_pk_nd_file, 'w') as jsonfile:
+                    json.dump(ljmeta, jsonfile, separators=(',', ':'),
                               sort_keys=False, indent=4, ensure_ascii=False, encoding='utf-8')
             else:
                 log.logger.error('Can not get metadata at gen_schema() ... ')
