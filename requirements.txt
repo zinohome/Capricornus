@@ -24,3 +24,4 @@ dataset==1.5.2
 slugify==0.0.1
 simple_rest_client==1.1.2
 hypercorn[trio]==0.13.2
+cryptography==36.0.2
