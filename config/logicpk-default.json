@@ -9,11 +9,6 @@
             "Name":"view_name",
             "Type":"view",
             "PrimaryKeys":["key1id_name","key2id_name"]
-        },
-        "ogdbuser":{
-            "Name":"ogdbuser",
-            "Type":"table",
-            "PrimaryKeys":["ogdbuser_id"]
         }
     }
 }
