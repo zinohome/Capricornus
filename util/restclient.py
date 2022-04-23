@@ -260,7 +260,7 @@ if __name__ == '__main__':
         log.logger.debug(ncmeta)
         resultstr = nc.fetch('ogdbuser', '_table', None, 0, 5, True)
         log.logger.debug(resultstr)
-
+        '''
         table_name = 'ogdbconnect'
         pkname = 'ogdbconnect.ogdb_id'
         spkname = pkname
@@ -270,6 +270,7 @@ if __name__ == '__main__':
             #key.replace(table_name + '.',"",1)
         log.logger.debug("spkname: %s" % spkname)
         log.logger.debug("pkname: %s" % pkname)
+        '''
         '''
         log.logger.debug(nc.fetchusers())
         ncdb = nc.fetch('database','_schema')
