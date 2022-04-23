@@ -159,7 +159,10 @@ class {{ name }}Service(object):
         pks = {{ name }}.getPrimaryKeys({{ name }})
         statement = select({{ name }})
         for pk in pks:
-            statement = statement.where(eval("{{ name }}."+ pk + "==" +str(updatejson[pk])))
+            if {{ name }}.getpkqmneed({{ name }},pk):
+                statement = statement.where(eval("ogdbconnect." + pk + "=='" + str(updatejson[pk])+"'"))
+            else:
+                statement = statement.where(eval("ogdbconnect."+ pk + "==" +str(updatejson[pk])))
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:

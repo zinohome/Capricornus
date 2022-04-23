@@ -344,6 +344,19 @@ class DBMeta(object):
         else:
             return None
 
+    def get_table_pk_type(self,tablename,pkname):
+        pk_type = 'VARCHAR'
+        table = self.gettable(tablename)
+        pk_type = table.getColumnType(pkname)
+        return pk_type
+
+    def get_table_pk_qmneed(self,tablename,pkname):
+        pk_qmneed = False
+        pk_type = self.get_table_pk_type(tablename,pkname)
+        if pk_type in ['CHAR','VARCHAR','TEXT','DATE','DATETIME','TIMESTAMP','YEAR','TIME']:
+            pk_qmneed = True
+        return pk_qmneed
+
     def get_tables(self):
         tblist = []
         for tb in self._tables:

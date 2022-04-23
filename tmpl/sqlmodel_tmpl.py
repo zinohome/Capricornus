@@ -53,3 +53,9 @@ class {{ name }}(SQLModel, table=True):
 
     def getPrimaryKeys(self):
         return meta.gettable('{{ name }}').primarykeys
+
+    def getPKType(self,pkname):
+        return meta.get_table_pk_type('{{ name }}',pkname)
+
+    def getpkqmneed(self,pkname):
+        return meta.get_table_pk_qmneed('{{ name }}',pkname)
