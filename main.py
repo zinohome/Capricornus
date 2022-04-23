@@ -41,7 +41,9 @@ from fastapi.openapi.docs import (
     get_swagger_ui_oauth2_redirect_html,
 )
 
+'''config'''
 cfg = config.app_config
+
 
 '''logging'''
 log = log.Logger(level=cfg['Application_Config'].app_log_level)
@@ -75,6 +77,9 @@ app = FastAPI(
     redoc_url=None
 )
 
+'''dbmeta'''
+maindbmeta = dbmeta.DBMeta()
+
 favicon_path = 'static/favicon.ico'
 app.mount("/static", StaticFiles(directory="admin/apps/static"), name="static")
 
@@ -84,9 +89,8 @@ async def startup_event():
     if cfg['Application_Config'].app_clear_metadat_on_startup:
         clear_meta_cache()
     if cfg['Application_Config'].app_load_metadat_on_load:
-        meta = dbmeta.DBMeta()
-        meta.gen_models()
-        meta.gen_services()
+        maindbmeta.gen_models()
+        maindbmeta.gen_services()
     log.logger.info(cfg['Application_Config'].app_name + ' Started')
 
 @app.on_event("shutdown")
@@ -218,7 +222,7 @@ async def read_users_me(current_user: security.User = Depends(security.get_curre
          description="By default, all tables are returned .",include_in_schema=False)
 async def get_dbdiagram():
     log.logger.debug('Access \'/_schema/dbdiagram\' : run in get_dbdiagram()')
-    return dbmeta.DBMeta().response_dbdiagram("dbdiagram-canvas.json")
+    return maindbmeta.response_dbdiagram("dbdiagram-canvas.json")
 
 @app.get(prefix+"/_schema/dbdll",
          tags=["Schema"],
@@ -226,7 +230,7 @@ async def get_dbdiagram():
          description="By default, all tables are returned .",include_in_schema=False)
 async def get_dbdiagram():
     log.logger.debug('Access \'/_schema/dbdll\' : run in get_dbdiagram()')
-    return dbmeta.DBMeta().response_dbdiagram("dbddl.sql")
+    return maindbmeta.response_dbdiagram("dbddl.sql")
 
 if services_model >= 1:
     @app.get(prefix + "/_schema/database",
@@ -236,7 +240,7 @@ if services_model >= 1:
              )
     async def get_schema():
         log.logger.debug('Access \'/_schema/database\' : run in get_schema()')
-        return dbmeta.DBMeta().response_schema()
+        return maindbmeta.response_schema()
 
     @app.get(prefix + "/_schema/_table/{table_name}",
              tags=["Schema"],
@@ -246,12 +250,12 @@ if services_model >= 1:
     async def get_table_schema(table_name: str):
         log.logger.debug('Access \'/_schema/{table_name}\' : run in get_table_schema(), '
                          'input data table_name: [%s]' % table_name)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
             )
-        return dbmeta.DBMeta().response_table_schema(table_name)
+        return maindbmeta.response_table_schema(table_name)
 
     @app.get(prefix + "/_table/{table_name}",
              tags=["Data - Table Level"],
@@ -304,7 +308,7 @@ if services_model >= 1:
         queryjson['count_only'] = count_only
         queryjson['include_count'] = include_count
         log.logger.debug('queryjson: [%s]' % queryjson)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -339,7 +343,7 @@ if services_model >= 1:
         log.logger.debug(
             'Access \'/_table/_query{table_name}/\' : run in query_data(), input data table_name: [%s]' % table_name)
         log.logger.debug('body: [%s]' % tablequerybody.json())
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -367,7 +371,7 @@ if services_model >= 1:
             'Access \'/_table/{table_name}/{id}\' : run in get_data_by_id(), input data table_name: [%s]' % table_name)
         log.logger.debug('idfield: [%s]' % idfield)
         log.logger.debug('id: [%s]' % id)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -404,7 +408,7 @@ if services_model >= 1:
         log.logger.debug(
             'Access \'/_table/{table_name}/querybyid\' : run in query_data_by_id(), input data table_name: [%s]' % table_name)
         log.logger.debug('body: [%s]' % tablequerybyid)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -427,7 +431,7 @@ else:
              )
     async def get_schema(current_user: security.User = Depends(security.get_current_active_user)):
         log.logger.debug('Access \'/_schema/database\' : run in get_schema()')
-        return dbmeta.DBMeta().response_schema()
+        return maindbmeta.response_schema()
 
     @app.get(prefix + "/_schema/_table/{table_name}",
              tags=["Schema"],
@@ -438,12 +442,12 @@ else:
                                current_user: security.User = Depends(security.get_current_active_user)):
         log.logger.debug('Access \'/_schema/{table_name}\' : run in get_table_schema(), '
                          'input data table_name: [%s]' % table_name)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
             )
-        return dbmeta.DBMeta().response_table_schema(table_name)
+        return maindbmeta.response_table_schema(table_name)
 
     @app.get(prefix + "/_table/{table_name}",
              tags=["Data - Table Level"],
@@ -497,7 +501,7 @@ else:
         queryjson['count_only'] = count_only
         queryjson['include_count'] = include_count
         log.logger.debug('queryjson: [%s]' % queryjson)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -533,7 +537,7 @@ else:
         log.logger.debug(
             'Access \'/_table/_query{table_name}/\' : run in query_data(), input data table_name: [%s]' % table_name)
         log.logger.debug('body: [%s]' % tablequerybody.json())
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -562,7 +566,7 @@ else:
             'Access \'/_table/{table_name}/{id}\' : run in get_data_by_id(), input data table_name: [%s]' % table_name)
         log.logger.debug('idfield: [%s]' % idfield)
         log.logger.debug('id: [%s]' % id)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -600,7 +604,7 @@ else:
         log.logger.debug(
             'Access \'/_table/{table_name}/querybyid\' : run in query_data_by_id(), input data table_name: [%s]' % table_name)
         log.logger.debug('body: [%s]' % tablequerybyid)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -635,7 +639,7 @@ if services_model >= 2:
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in post_data(), input data table_name: [%s]' % table_name)
         log.logger.debug('body data: [%s]' % tablepost.json())
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -665,7 +669,7 @@ if services_model >= 2:
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in put_data(), input data table_name: [%s]' % table_name)
         log.logger.debug('body: [%s]' % tableput.json())
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -690,7 +694,7 @@ if services_model >= 2:
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in delete_data(), input data table_name: [%s]' % table_name)
         log.logger.debug('filter: [%s]' % filterstr)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -723,7 +727,7 @@ if services_model >= 2:
             'Access \'/_table/{table_name}/{id}\' : run in put_data_by_id(), input data table_name: [%s]' % table_name)
         log.logger.debug('body: [%s]' % tableputbyid)
         log.logger.debug('id: [%s]' % id)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -738,7 +742,7 @@ if services_model >= 2:
         for key, value in ikdv.items():
             # log.logger.debug(key + '=' + value)
             if operator.contains(key, table_name + '.'):
-                updateentity[key.strip(table_name + '.')] = value
+                updateentity[key.replace(table_name + '.',"",1)] = value
             else:
                 updateentity[key] = value
         return getattr(dataservice, 'update_' + table_name.strip() + '_byjson')(updateentity)
@@ -763,7 +767,7 @@ if services_model >= 2:
             'Access \'/_table/{table_name}/{id}\' : run in delete_data_by_id(), input data table_name: [%s]' % table_name)
         log.logger.debug('id: [%s]' % id)
         log.logger.debug('idfield: [%s]' % idfield)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -772,11 +776,21 @@ if services_model >= 2:
         dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
         idfldtuple = tuple(filter(None, idfield.replace(' ', '').split(',')))
         idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
-        idqrytuple = tuple(zip(idfldtuple, idtuple))
-        idstr = ''
-        for idqry in idqrytuple:
-            idstr = idstr + "==".join(idqry) + ","
-        idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
+        idcount = len(idfldtuple)
+        idwherestr =''
+        for index in range(idcount):
+            pkname = idfldtuple[index]
+            spkname = pkname
+            if operator.contains(pkname, table_name + '.'):
+                spkname = pkname.replace(table_name + '.', "", 1)
+            if maindbmeta.get_table_pk_qmneed(table_name, spkname):
+                idwherestr = idwherestr + "("+pkname+"=='"+idtuple[index]+"')"
+            else:
+                idwherestr = idwherestr + "("+pkname+"=="+idtuple[index]+")"
+            if index < idcount - 1:
+                idwherestr = idwherestr + " & "
+        if idcount > 1:
+            idwherestr = "(" + idwherestr + ")"
         log.logger.debug('delete_data_by_id() querystr: [%s]' % idwherestr)
         return getattr(dataservice, 'delete_' + table_name.strip() + '_byid')(idwherestr)
 
@@ -801,7 +815,7 @@ else:
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in post_data(), input data table_name: [%s]' % table_name)
         log.logger.debug('body data: [%s]' % tablepost.json())
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -832,7 +846,7 @@ else:
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in put_data(), input data table_name: [%s]' % table_name)
         log.logger.debug('body: [%s]' % tableput.json())
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -858,7 +872,7 @@ else:
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in delete_data(), input data table_name: [%s]' % table_name)
         log.logger.debug('filter: [%s]' % filterstr)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -892,7 +906,7 @@ else:
             'Access \'/_table/{table_name}/{id}\' : run in put_data_by_id(), input data table_name: [%s]' % table_name)
         log.logger.debug('body: [%s]' % tableputbyid)
         log.logger.debug('id: [%s]' % id)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -907,7 +921,7 @@ else:
         for key, value in ikdv.items():
             # log.logger.debug(key + '=' + value)
             if operator.contains(key, table_name + '.'):
-                updateentity[key.strip(table_name + '.')] = value
+                updateentity[key.replace(table_name + '.',"",1)] = value
             else:
                 updateentity[key] = value
         return getattr(dataservice, 'update_' + table_name.strip() + '_byjson')(updateentity)
@@ -933,7 +947,7 @@ else:
             'Access \'/_table/{table_name}/{id}\' : run in delete_data_by_id(), input data table_name: [%s]' % table_name)
         log.logger.debug('id: [%s]' % id)
         log.logger.debug('idfield: [%s]' % idfield)
-        if not dbmeta.DBMeta().check_table_schema(table_name):
+        if not maindbmeta.check_table_schema(table_name):
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
                 detail='Table [ %s ] not found' % table_name
@@ -942,11 +956,21 @@ else:
         dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
         idfldtuple = tuple(filter(None, idfield.replace(' ', '').split(',')))
         idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
-        idqrytuple = tuple(zip(idfldtuple, idtuple))
-        idstr = ''
-        for idqry in idqrytuple:
-            idstr = idstr + "==".join(idqry) + ","
-        idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
+        idcount = len(idfldtuple)
+        idwherestr =''
+        for index in range(idcount):
+            pkname = idfldtuple[index]
+            spkname = pkname
+            if operator.contains(pkname, table_name + '.'):
+                spkname = pkname.replace(table_name + '.', "", 1)
+            if maindbmeta.get_table_pk_qmneed(table_name, spkname):
+                idwherestr = idwherestr + "("+pkname+"=='"+idtuple[index]+"')"
+            else:
+                idwherestr = idwherestr + "("+pkname+"=="+idtuple[index]+")"
+            if index < idcount - 1:
+                idwherestr = idwherestr + " & "
+        if idcount > 1:
+            idwherestr = "(" + idwherestr + ")"
         log.logger.debug('delete_data_by_id() querystr: [%s]' % idwherestr)
         return getattr(dataservice, 'delete_' + table_name.strip() + '_byid')(idwherestr)
 
@@ -989,14 +1013,14 @@ async def reload_meta(SecuretKey: str = Header(..., min_length=5),
         'Access \'/sys/reloadmeta\' : run in reload_meta(), input data: [ %s ]' % SecuretKey)
     if SecuretKey == cfg['Application_Config'].app_confirm_key:
         clear_meta_cache()
-        schema_file = dbmeta.DBMeta().schema_file
+        schema_file = maindbmeta.schema_file
         if os.path.exists(schema_file):
             os.remove(schema_file)
-        dbmeta.DBMeta().load_metadata()
-        dbmeta.DBMeta().gen_schema()
-        dbmeta.DBMeta().load_schema()
-        dbmeta.DBMeta().gen_models()
-        dbmeta.DBMeta().gen_services()
+        maindbmeta.load_metadata()
+        maindbmeta.gen_schema()
+        maindbmeta.load_schema()
+        maindbmeta.gen_models()
+        maindbmeta.gen_services()
         return {
             "Reload_Meta": 'Sucessful'
         }
