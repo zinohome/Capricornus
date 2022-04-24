@@ -14,8 +14,6 @@ import collections
 import distutils
 import traceback
 
-import evalidate
-from simpleeval import simple_eval
 import simplejson as json
 from sqlalchemy import func
 
@@ -129,6 +127,8 @@ class {{ name }}Service(object):
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
+                #TODO
+                #Change the usage of eval to sqlalchem TEXT
                 statement = select({{ name }}).where(eval(idstr))
                 result = session.exec(statement).one()
                 #log.logger.debug('get_{{ name }}_byid() result is : %s' % result)
@@ -162,6 +162,8 @@ class {{ name }}Service(object):
         log.logger.debug('The update JSON is: %s' % updatejson)
         pks = {{ name }}.getPrimaryKeys({{ name }})
         statement = select({{ name }})
+        #TODO
+        #Change the usage of eval to sqlalchem TEXT
         for pk in pks:
             if {{ name }}.getpkqmneed({{ name }},pk):
                 statement = statement.where(eval("{{ name }}." + pk + "=='" + str(updatejson[pk])+"'"))
@@ -206,6 +208,8 @@ class {{ name }}Service(object):
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
+                #TODO
+                #Change the usage of eval to sqlalchem TEXT
                 statement = select({{ name }}).where(eval(idstr))
                 result = session.exec(statement).one()
                 log.logger.debug('delete_{{ name }}_byid() result is : %s' % result)
@@ -227,6 +231,8 @@ class {{ name }}Service(object):
             #add querycolumns
             fullqueryfields = "{{ name }}." + ",{{ name }}.".join(tuple({{ name }}.__fields__.keys()))
             queryfields = fullqueryfields
+            #TODO
+            #Change the usage of eval to sqlalchem TEXT
             querystr = queryjson['queryfields'] if 'queryfields' in queryjson else None
             if querystr is not None:
                 queryfields = querystr.replace(' ','')

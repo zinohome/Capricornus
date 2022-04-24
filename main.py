@@ -24,6 +24,7 @@ import simplejson as json
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.wsgi import WSGIMiddleware
 from flask import Flask
+from flask_debugtoolbar import DebugToolbarExtension
 from starlette import status
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import FileResponse, JSONResponse, RedirectResponse
@@ -108,6 +109,10 @@ admin_app.config.from_object(cfg['Admin_Config'])
 
 '''SQLAlchemy Profiler'''
 admin_app.wsgi_app = EasyProfileMiddleware(admin_app.wsgi_app, reporter=StreamReporter(display_duplicates=100))
+
+'''Flask debug toolbar'''
+admin_app.config['DEBUG_TB_PROFILER_ENABLED'] = True
+toolbar = DebugToolbarExtension(admin_app)
 # login
 login_manager.init_app(admin_app)
 # blueprint
