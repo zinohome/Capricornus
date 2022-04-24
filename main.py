@@ -17,7 +17,7 @@ import os
 import importlib
 from datetime import timedelta
 
-from easy_profile import EasyProfileMiddleware
+from easy_profile import EasyProfileMiddleware, StreamReporter
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.openapi.docs import get_swagger_ui_html
 import simplejson as json
@@ -105,7 +105,9 @@ DEBUG = cfg['Admin_Config'].DEBUG
 get_config_mode = 'Debug'
 admin_app = Flask(__name__, template_folder='admin/apps/templates', static_folder='admin/apps/static')
 admin_app.config.from_object(cfg['Admin_Config'])
-admin_app.wsgi_app = EasyProfileMiddleware(admin_app.wsgi_app)
+
+'''SQLAlchemy Profiler'''
+admin_app.wsgi_app = EasyProfileMiddleware(admin_app.wsgi_app, reporter=StreamReporter(display_duplicates=100))
 # login
 login_manager.init_app(admin_app)
 # blueprint
@@ -1044,14 +1046,12 @@ async def sys_status(SecuretKey: str = Header(..., min_length=5),
     """
     log.logger.debug(
         'Access \'/sys/status\' : run in main.py, input data: [ %s ]' % SecuretKey)
+    returnjson = {}
     if SecuretKey == cfg['Application_Config'].app_confirm_key:
-        return {
-            "Pool_status": dbengine.DBEngine().connect().pool.status()
-        }
+        returnjson = {"Pool_status": dbengine.DBEngine().connect().pool.status()}
     else:
-        return {
-            "Sys_status": 'Operation Aborted'
-        }
+        returnjson = {"Sys_status": "Operation Aborted"}
+    return returnjson
 
 def clear_meta_cache():
     # cache file define
