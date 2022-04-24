@@ -148,8 +148,7 @@ class CustomersService(object):
             with Session(engine) as session:
                 session.add(customer)
                 session.commit()
-                if cfg['Schema_Config'].schema_model_refresh:
-                    session.refresh(customer)
+                session.refresh(customer)
                 return customer
         except Exception as e:
             log.logger.error('Exception at update_Customers(): %s ' % e)
@@ -163,13 +162,12 @@ class CustomersService(object):
         log.logger.debug('The update JSON is: %s' % updatejson)
         pks = Customers.getPrimaryKeys(Customers)
         statement = select(Customers)
-        #TODO
-        #Change the usage of eval to sqlalchem TEXT
         for pk in pks:
             if Customers.getpkqmneed(Customers,pk):
-                statement = statement.where(eval("Customers." + pk + "=='" + str(updatejson[pk])+"'"))
+                statement = statement.where(text("Customers." + pk + "=='" + str(updatejson[pk])+"'"))
             else:
-                statement = statement.where(eval("Customers."+ pk + "==" +str(updatejson[pk])))
+                statement = statement.where(text("Customers."+ pk + "==" +str(updatejson[pk])))
+        log.logger.debug(statement)
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
@@ -179,8 +177,7 @@ class CustomersService(object):
                         modcustomer.__setattr__(field.name, updatejson[field.name])
                 session.add(modcustomer)
                 session.commit()
-                if cfg['Schema_Config'].schema_model_refresh:
-                    session.refresh(modcustomer)
+                session.refresh(modcustomer)
                 return modcustomer
         except Exception as e:
             log.logger.error('Exception at update_Customers_byjson(): %s ' % e)
@@ -358,17 +355,17 @@ if __name__ == '__main__':
     customer_mod = cs.get_Customers_byid("Customers.customer_id=="+str(newid['customer_id']))
     log.logger.info('The Customer get by id is : %s' % customer_mod)
     log.logger.info('The Customer get by id JSON is : %s' % customer_mod.sortJson())
-    '''
     log.logger.error('====================== update_Customers() ======================')
     customer_mod.first_name = "SanFeng"
     log.logger.info("The before mod customer is :%s" % customer_mod)
     customer_moded = cs.update_Customers(customer_mod)
     log.logger.info("The moded customer is :%s" % customer_moded)
     log.logger.error('====================== update_Customers_byjson() ======================')
-    updatejsonstr = '{"birthdate": "1979-11-26", "customer_id": 630, "email": "zhangjunqd@gmail.com", "first_name": "Jun", "gender": "Male", "household_income": 120000, "last_name": "Zhang", "phone_number": 17895329550}'
+    updatejsonstr = '{"birthdate": "1979-11-26", "customer_id": 617, "email": "zhangjunqd@gmail.com", "first_name": "Jun", "gender": "Male", "household_income": 120000, "last_name": "Zhang", "phone_number": 17895329550}'
     log.logger.info("The before mod customer is :%s" % updatejsonstr)
     customer_moded = cs.update_Customers_byjson(json.loads(updatejsonstr))
     log.logger.info("The moded customer is :%s" % customer_moded)
+    '''
     log.logger.error('====================== query_Customers() ======================')
     querystr = '{' \
                    '"queryfields":"Customers.first_name,Customers.last_name,Customers.customer_id",' \

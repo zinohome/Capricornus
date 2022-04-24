@@ -147,8 +147,7 @@ class {{ name }}Service(object):
             with Session(engine) as session:
                 session.add(customer)
                 session.commit()
-                if cfg['Schema_Config'].schema_model_refresh:
-                    session.refresh(customer)
+                session.refresh(customer)
                 return customer
         except Exception as e:
             log.logger.error('Exception at update_{{ name }}(): %s ' % e)
@@ -162,13 +161,11 @@ class {{ name }}Service(object):
         log.logger.debug('The update JSON is: %s' % updatejson)
         pks = {{ name }}.getPrimaryKeys({{ name }})
         statement = select({{ name }})
-        #TODO
-        #Change the usage of eval to sqlalchem TEXT
         for pk in pks:
             if {{ name }}.getpkqmneed({{ name }},pk):
-                statement = statement.where(eval("{{ name }}." + pk + "=='" + str(updatejson[pk])+"'"))
+                statement = statement.where(text("{{ name }}." + pk + "=='" + str(updatejson[pk])+"'"))
             else:
-                statement = statement.where(eval("{{ name }}."+ pk + "==" +str(updatejson[pk])))
+                statement = statement.where(text("{{ name }}."+ pk + "==" +str(updatejson[pk])))
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:

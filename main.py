@@ -112,6 +112,8 @@ admin_app.wsgi_app = EasyProfileMiddleware(admin_app.wsgi_app, reporter=StreamRe
 
 '''Flask debug toolbar'''
 admin_app.config['DEBUG_TB_PROFILER_ENABLED'] = True
+admin_app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
 toolbar = DebugToolbarExtension(admin_app)
 # login
 login_manager.init_app(admin_app)
