@@ -17,6 +17,7 @@ import os
 import importlib
 from datetime import timedelta
 
+from easy_profile import EasyProfileMiddleware
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.openapi.docs import get_swagger_ui_html
 import simplejson as json
@@ -104,6 +105,7 @@ DEBUG = cfg['Admin_Config'].DEBUG
 get_config_mode = 'Debug'
 admin_app = Flask(__name__, template_folder='admin/apps/templates', static_folder='admin/apps/static')
 admin_app.config.from_object(cfg['Admin_Config'])
+admin_app.wsgi_app = EasyProfileMiddleware(admin_app.wsgi_app)
 # login
 login_manager.init_app(admin_app)
 # blueprint

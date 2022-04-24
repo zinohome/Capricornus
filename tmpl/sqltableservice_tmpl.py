@@ -14,6 +14,8 @@ import collections
 import distutils
 import traceback
 
+import evalidate
+from simpleeval import simple_eval
 import simplejson as json
 from sqlalchemy import func
 
