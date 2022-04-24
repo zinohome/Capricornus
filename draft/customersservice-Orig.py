@@ -206,9 +206,7 @@ class CustomersService(object):
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
-                #TODO
-                #Change the usage of eval to sqlalchem TEXT
-                statement = select(Customers).where(eval(idstr))
+                statement = select(Customers).where(text(idstr))
                 result = session.exec(statement).one()
                 log.logger.debug('delete_Customers_byid() result is : %s' % result)
                 session.delete(result)
