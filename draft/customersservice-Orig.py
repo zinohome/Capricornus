@@ -8,13 +8,14 @@
 #  @Author  : Zhang Jun
 #  @Email   : ibmzhangjun@139.com
 #  @Software: Capricornus
+
 import ast
 import collections
 import distutils
 import traceback
 
 import simplejson as json
-from sqlalchemy import func
+from sqlalchemy import func, text
 
 from sqlmodel import Session, select
 
@@ -74,7 +75,9 @@ class CustomersService(object):
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
-                results = session.execute('select count(*) from Customers')
+                pks = Customers.getPrimaryKeys(Customers)
+                stmt = text("select count("+pks[0]+") as rowcount from Customers")
+                results = session.execute(stmt)
                 return results.one()[0]
         except Exception as e:
             log.logger.error('Exception at get_Customers_count(): %s ' % e)
@@ -90,7 +93,8 @@ class CustomersService(object):
             with Session(engine) as session:
                 session.add(customer)
                 session.commit()
-                session.refresh(customer)
+                if cfg['Schema_Config'].schema_model_refresh:
+                    session.refresh(customer)
                 pks = Customers.getPrimaryKeys(Customers)
                 returnjson = {}
                 for pk in pks:
@@ -107,7 +111,7 @@ class CustomersService(object):
     def batch_create_Customers_byjson(self, jsonstr):
         batchjson = json.loads(jsonstr)
         batchdata = batchjson['data'] if 'data' in batchjson else None
-        returnjson = {"ids":[],"data":[]}
+        returnjson = {"ids": [], "data": []}
         try:
             for bdata in batchdata:
                 newentity = self.new_model(bdata)
@@ -125,7 +129,8 @@ class CustomersService(object):
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
-                statement = select(Customers).where(eval(idstr))
+                statement = select(Customers).where(text(idstr))
+                log.logger.debug("statement is: %s" % statement)
                 result = session.exec(statement).one()
                 #log.logger.debug('get_Customers_byid() result is : %s' % result)
                 return result
@@ -143,7 +148,8 @@ class CustomersService(object):
             with Session(engine) as session:
                 session.add(customer)
                 session.commit()
-                session.refresh(customer)
+                if cfg['Schema_Config'].schema_model_refresh:
+                    session.refresh(customer)
                 return customer
         except Exception as e:
             log.logger.error('Exception at update_Customers(): %s ' % e)
@@ -157,8 +163,13 @@ class CustomersService(object):
         log.logger.debug('The update JSON is: %s' % updatejson)
         pks = Customers.getPrimaryKeys(Customers)
         statement = select(Customers)
+        #TODO
+        #Change the usage of eval to sqlalchem TEXT
         for pk in pks:
-            statement = statement.where(eval("Customers."+ pk + "==" +str(updatejson[pk])))
+            if Customers.getpkqmneed(Customers,pk):
+                statement = statement.where(eval("Customers." + pk + "=='" + str(updatejson[pk])+"'"))
+            else:
+                statement = statement.where(eval("Customers."+ pk + "==" +str(updatejson[pk])))
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
@@ -168,7 +179,8 @@ class CustomersService(object):
                         modcustomer.__setattr__(field.name, updatejson[field.name])
                 session.add(modcustomer)
                 session.commit()
-                session.refresh(modcustomer)
+                if cfg['Schema_Config'].schema_model_refresh:
+                    session.refresh(modcustomer)
                 return modcustomer
         except Exception as e:
             log.logger.error('Exception at update_Customers_byjson(): %s ' % e)
@@ -197,6 +209,8 @@ class CustomersService(object):
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
+                #TODO
+                #Change the usage of eval to sqlalchem TEXT
                 statement = select(Customers).where(eval(idstr))
                 result = session.exec(statement).one()
                 log.logger.debug('delete_Customers_byid() result is : %s' % result)
@@ -218,13 +232,15 @@ class CustomersService(object):
             #add querycolumns
             fullqueryfields = "Customers." + ",Customers.".join(tuple(Customers.__fields__.keys()))
             queryfields = fullqueryfields
+            #TODO
+            #Change the usage of eval to sqlalchem TEXT
             querystr = queryjson['queryfields'] if 'queryfields' in queryjson else None
             if querystr is not None:
                 queryfields = querystr.replace(' ','')
                 if "*" in queryfields:
                     queryfields=fullqueryfields
             if len(queryfields.split(',')) == 1:
-                statement = select(ast.literal_eval(queryfields))
+                statement = select(eval(queryfields))
             else:
                 statement = select(from_obj=Customers, columns=eval(queryfields))
             #add distinct
@@ -342,6 +358,7 @@ if __name__ == '__main__':
     customer_mod = cs.get_Customers_byid("Customers.customer_id=="+str(newid['customer_id']))
     log.logger.info('The Customer get by id is : %s' % customer_mod)
     log.logger.info('The Customer get by id JSON is : %s' % customer_mod.sortJson())
+    '''
     log.logger.error('====================== update_Customers() ======================')
     customer_mod.first_name = "SanFeng"
     log.logger.info("The before mod customer is :%s" % customer_mod)
@@ -370,3 +387,4 @@ if __name__ == '__main__':
     log.logger.info('The delete Customer ID is : %s' % newid)
     cs.delete_Customers_byid("Customers.customer_id == "+str(newid['customer_id']))
     log.logger.info('The Customer get by id is : %s' % cs.get_Customers_byid(newid))
+    '''

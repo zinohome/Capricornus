@@ -15,7 +15,7 @@ import distutils
 import traceback
 
 import simplejson as json
-from sqlalchemy import func
+from sqlalchemy import func, text
 
 from sqlmodel import Session, select
 
@@ -75,7 +75,9 @@ class {{ name }}Service(object):
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
-                results = session.execute('select count(*) from {{ name }}')
+                pks = {{ name }}.getPrimaryKeys({{ name }})
+                stmt = text("select count(" + pks[0] + ") as rowcount from {{ name }}")
+                results = session.execute(stmt)
                 return results.one()[0]
         except Exception as e:
             log.logger.error('Exception at get_{{ name }}_count(): %s ' % e)
@@ -127,9 +129,7 @@ class {{ name }}Service(object):
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
-                #TODO
-                #Change the usage of eval to sqlalchem TEXT
-                statement = select({{ name }}).where(eval(idstr))
+                statement = select(Customers).where(text(idstr))
                 result = session.exec(statement).one()
                 #log.logger.debug('get_{{ name }}_byid() result is : %s' % result)
                 return result
