@@ -8,6 +8,7 @@
 #  @Author  : Zhang Jun
 #  @Email   : ibmzhangjun@139.com
 #  @Software: Capricornus
+import ast
 import collections
 import distutils
 import traceback
@@ -223,7 +224,7 @@ class CustomersService(object):
                 if "*" in queryfields:
                     queryfields=fullqueryfields
             if len(queryfields.split(',')) == 1:
-                statement = select(eval(queryfields))
+                statement = select(ast.literal_eval(queryfields))
             else:
                 statement = select(from_obj=Customers, columns=eval(queryfields))
             #add distinct

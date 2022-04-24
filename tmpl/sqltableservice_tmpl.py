@@ -8,6 +8,8 @@
 #  @Author  : Zhang Jun
 #  @Email   : ibmzhangjun@139.com
 #  @Software: Capricornus
+
+import ast
 import collections
 import distutils
 import traceback
