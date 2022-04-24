@@ -29,3 +29,4 @@ brython==3.10.5
 evalidate==0.7.8
 simpleeval==0.9.12
 sqlalchemy-easy-profile==1.2.1
+sqlalchemy-utils==0.38.2
