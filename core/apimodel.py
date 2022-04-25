@@ -19,8 +19,9 @@ from config import config
 class TableQueryBody(BaseModel):
     queryfields: Optional[str] = '*'  # eg. "Customers.first_name,Customers.last_name,Customers.customer_id"
     distinct: Optional[bool] = False
-    where: Optional[str] = None
-    order_by: Optional[str] = None
+    where_query: Optional[str] = None  # eg. "(Customers.first_name != :first_name OR Customers.household_income > :household_income)"
+    where_bind: Optional[str] = None   # eg. "first_name=\'Tony\',household_income=8100"
+    order_by: Optional[str] = None     # eg. "Customers.first_name ASC"
     group_by: Optional[str] = None
     limit: Optional[int] = 10
     offset: Optional[int] = 0
