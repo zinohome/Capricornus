@@ -290,7 +290,7 @@ if services_model >= 1:
                 - **table_name** (path): **Required** - Name of the table to perform operations on.
                 - **"queryfields"** (header): "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                 - **"distinct"** (header): 'False',  -- Optional , default['False'] - Return distinct result.
-                - **"where_query"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) & (Customers.last_name != :last_name)'
+                - **"where_query"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
                 - **"where_bind"** (header): "string",  -- Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
                 - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                 - **"group_by** (header)": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
@@ -345,7 +345,7 @@ if services_model >= 1:
                     {
                      "queryfields": "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                      "distinct": 'False',  -- Optional , default['False'] - Return distinct result.
-                     "where_query": "string",  -- Optional - Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) & (Customers.last_name != :last_name)'
+                     "where_query": "string",  -- Optional - Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
                      "where_bind": "string",  -- Optional - Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
                      "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                      "group_by": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
@@ -488,7 +488,7 @@ else:
                 - **table_name** (path): **Required** - Name of the table to perform operations on.
                 - **"queryfields"** (header): "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                 - **"distinct"** (header): 'False',  -- Optional , default['False'] - Return distinct result.
-                - **"where_query"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) & (Customers.last_name != :last_name)'
+                - **"where_query"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
                 - **"where_bind"** (header): "string",  -- Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
                 - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                 - **"group_by** (header)": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
@@ -544,7 +544,7 @@ else:
                     {
                      "queryfields": "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                      "distinct": 'False',  -- Optional , default['False'] - Return distinct result.
-                     "where_query": "string",  -- Optional - Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) & (Customers.last_name != :last_name)'
+                     "where_query": "string",  -- Optional - Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
                      "where_bind": "string",  -- Optional - Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
                      "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                      "group_by": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
