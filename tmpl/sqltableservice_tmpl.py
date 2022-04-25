@@ -163,9 +163,9 @@ class {{ name }}Service(object):
         statement = select({{ name }})
         for pk in pks:
             if {{ name }}.getpkqmneed({{ name }},pk):
-                statement = statement.where(text("{{ name }}." + pk + "=='" + str(updatejson[pk])+"'"))
+                statement = statement.where(text("{{ name }}." + pk + "='" + str(updatejson[pk])+"'"))
             else:
-                statement = statement.where(text("{{ name }}."+ pk + "==" +str(updatejson[pk])))
+                statement = statement.where(text("{{ name }}."+ pk + "=" +str(updatejson[pk])))
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
