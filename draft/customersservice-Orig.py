@@ -247,11 +247,12 @@ class CustomersService(object):
             if ( wherefields is not None ) & ( wherebind is not None ):
                 textclauststr = textclauststr + " WHERE " + wherefields
             # where bind parameters
-            wherebindstrlist = wherebind.split(',')
             wherebindjson = {}
-            for wb in wherebindstrlist:
-                key, val = wb.split('=')
-                wherebindjson[key] = val
+            if wherebind is not None:
+                wherebindstrlist = wherebind.split(',')
+                for wb in wherebindstrlist:
+                    key, val = wb.split('=')
+                    wherebindjson[key] = val
             #log.logger.debug("where bind params: %s" % wherebindjson)
             # order_by
             orderfields = queryjson['order_by'] if 'order_by' in queryjson else None
