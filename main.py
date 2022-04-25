@@ -276,7 +276,8 @@ if services_model >= 1:
     async def get_data(table_name: str,
                        queryfields: str = Header('*'),
                        distinct: bool = Header(False),
-                       where: str = Header(None),
+                       where_query: str = Header(None),
+                       where_bind: str = Header(None),
                        order_by: str = Header(None),
                        group_by: str = Header(None),
                        limit: int = Header(cfg['Query_Config'].query_default_limit, gt=0,
@@ -289,7 +290,8 @@ if services_model >= 1:
                 - **table_name** (path): **Required** - Name of the table to perform operations on.
                 - **"queryfields"** (header): "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                 - **"distinct"** (header): 'False',  -- Optional , default['False'] - Return distinct result.
-                - **"where"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') OR (Customers.household_income > 80001)) & (Customers.last_name != \'Stark\')'
+                - **"where_query"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) & (Customers.last_name != :last_name)'
+                - **"where_bind"** (header): "string",  -- Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
                 - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                 - **"group_by** (header)": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
                 - **"limit"** (header): 0,  -- Optional - Set to limit the filter results.
@@ -301,7 +303,8 @@ if services_model >= 1:
             'Access \'/_table/{table_name}\' : run in get_data(), input data table_name: [%s]' % table_name)
         # log.logger.debug('fieldlist: [%s]' % queryfields)
         # log.logger.debug('distinct: [%s]' % distinct)
-        # log.logger.debug('where: [%s]' % where)
+        # log.logger.debug('where_query: [%s]' % where_query)
+        # log.logger.debug('where_bind: [%s]' % where_bind)
         # log.logger.debug('order_by: [%s]' % order_by)
         # log.logger.debug('group_by: [%s]' % group_by)
         # log.logger.debug('limit: [%s]' % limit)
@@ -311,7 +314,8 @@ if services_model >= 1:
         queryjson = {}
         queryjson['queryfields'] = queryfields
         queryjson['distinct'] = distinct
-        queryjson['where'] = where
+        queryjson['where_query'] = where_query
+        queryjson['where_bind'] = where_bind
         queryjson['order_by'] = order_by
         queryjson['group_by'] = group_by
         queryjson['limit'] = limit
@@ -341,7 +345,8 @@ if services_model >= 1:
                     {
                      "queryfields": "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                      "distinct": 'False',  -- Optional , default['False'] - Return distinct result.
-                     "where": "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') OR (Customers.household_income > 80001)) AND (Customers.last_name != \'Stark\')'
+                     "where_query": "string",  -- Optional - Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) & (Customers.last_name != :last_name)'
+                     "where_bind": "string",  -- Optional - Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
                      "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                      "group_by": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
                      "limit": 0,  -- Optional - Set to limit the filter results.
@@ -468,7 +473,8 @@ else:
     async def get_data(table_name: str,
                        queryfields: str = Header('*'),
                        distinct: bool = Header(False),
-                       where: str = Header(None),
+                       where_query: str = Header(None),
+                       where_bind: str = Header(None),
                        order_by: str = Header(None),
                        group_by: str = Header(None),
                        limit: int = Header(cfg['Query_Config'].query_default_limit, gt=0,
@@ -482,7 +488,8 @@ else:
                 - **table_name** (path): **Required** - Name of the table to perform operations on.
                 - **"queryfields"** (header): "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                 - **"distinct"** (header): 'False',  -- Optional , default['False'] - Return distinct result.
-                - **"where"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') OR (Customers.household_income > 80001)) AND (Customers.last_name != \'Stark\')'
+                - **"where_query"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) & (Customers.last_name != :last_name)'
+                - **"where_bind"** (header): "string",  -- Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
                 - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                 - **"group_by** (header)": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
                 - **"limit"** (header): 0,  -- Optional - Set to limit the filter results.
@@ -494,7 +501,8 @@ else:
             'Access \'/_table/{table_name}\' : run in get_data(), input data table_name: [%s]' % table_name)
         # log.logger.debug('fieldlist: [%s]' % queryfields)
         # log.logger.debug('distinct: [%s]' % distinct)
-        # log.logger.debug('where: [%s]' % where)
+        # log.logger.debug('where_query: [%s]' % where_query)
+        # log.logger.debug('where_bind: [%s]' % where_bind)
         # log.logger.debug('order_by: [%s]' % order_by)
         # log.logger.debug('group_by: [%s]' % group_by)
         # log.logger.debug('limit: [%s]' % limit)
@@ -504,7 +512,8 @@ else:
         queryjson = {}
         queryjson['queryfields'] = queryfields
         queryjson['distinct'] = distinct
-        queryjson['where'] = where
+        queryjson['where_query'] = where_query
+        queryjson['where_bind'] = where_bind
         queryjson['order_by'] = order_by
         queryjson['group_by'] = group_by
         queryjson['limit'] = limit
@@ -535,7 +544,8 @@ else:
                     {
                      "queryfields": "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                      "distinct": 'False',  -- Optional , default['False'] - Return distinct result.
-                     "where": "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') OR (Customers.household_income > 80001)) & (Customers.last_name != \'Stark\')'
+                     "where_query": "string",  -- Optional - Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) & (Customers.last_name != :last_name)'
+                     "where_bind": "string",  -- Optional - Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
                      "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                      "group_by": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
                      "limit": 0,  -- Optional - Set to limit the filter results.
