@@ -129,7 +129,7 @@ class {{ name }}Service(object):
         try:
             engine = dbengine.DBEngine().connect()
             with Session(engine) as session:
-                statement = select(Customers).where(text(idstr))
+                statement = select({{ name }}).where(text(idstr))
                 result = session.exec(statement).one()
                 #log.logger.debug('get_{{ name }}_byid() result is : %s' % result)
                 return result
@@ -220,54 +220,63 @@ class {{ name }}Service(object):
             session.close()
 
     def query_{{ name }}(self,querystr):
+        tablename = "{{ name }}"
         if toolkit.validQueryJson(querystr):
             queryjson = json.loads(querystr)
             log.logger.debug('The query JSON is: %s' % queryjson)
-            #add querycolumns
-            fullqueryfields = "{{ name }}." + ",{{ name }}.".join(tuple({{ name }}.__fields__.keys()))
+            #queryfields
+            fullqueryfields = tablename+"." + ","+tablename+".".join(tuple({{ name }}.__fields__.keys()))
             queryfields = fullqueryfields
-            #TODO
-            #Change the usage of eval to sqlalchem TEXT
             querystr = queryjson['queryfields'] if 'queryfields' in queryjson else None
             if querystr is not None:
                 queryfields = querystr.replace(' ','')
                 if "*" in queryfields:
                     queryfields=fullqueryfields
-            if len(queryfields.split(',')) == 1:
-                statement = select(eval(queryfields))
-            else:
-                statement = select(from_obj={{ name }}, columns=eval(queryfields))
-            #add distinct
+            textclauststr = "SELECT "
+            #distinct
             bdistinct = queryjson['distinct'] if 'distinct' in queryjson else None
             if bdistinct is not None and distutils.util.strtobool(str(bdistinct)):
-                statement = statement.distinct()
-            # add where
-            wherefields = queryjson['where'] if 'where' in queryjson else None
-            if wherefields is not None:
-                statement = statement.where(eval(wherefields))
-            #add order_by
+                textclauststr = textclauststr + "DISTINCT "
+            # field + from
+            textclauststr = textclauststr + queryfields + " FROM " + tablename
+            #where
+            wherefields = queryjson['where_query'] if 'where_query' in queryjson else None
+            wherebind = queryjson['where_bind'] if 'where_bind' in queryjson else None
+            if ( wherefields is not None ) & ( wherebind is not None ):
+                textclauststr = textclauststr + " WHERE " + wherefields
+            # where bind parameters
+            wherebindstrlist = wherebind.split(',')
+            wherebindjson = {}
+            for wb in wherebindstrlist:
+                key, val = wb.split('=')
+                wherebindjson[key] = val
+            #log.logger.debug("where bind params: %s" % wherebindjson)
+            # order_by
             orderfields = queryjson['order_by'] if 'order_by' in queryjson else None
             if orderfields is not None:
-                orderfieldslist = tuple(filter(None,orderfields.replace(' ','').split(',')))
-                for order in orderfieldslist:
-                    statement = statement.order_by(eval(order))
-            #add group_by
-            #add limit & offset
+                textclauststr = textclauststr + " ORDER BY " + orderfields
+            #TODO group_by
+
+            # limit & offset
             dlimit = queryjson['limit'] if 'limit' in queryjson else None
             if dlimit is not None:
-                statement = statement.limit(dlimit)
+                textclauststr = textclauststr + " LIMIT :limitparam"
+                wherebindjson['limitparam'] = dlimit
             doffset = queryjson['offset'] if 'offset' in queryjson else None
             if doffset is not None:
-                statement = statement.offset(doffset)
+                textclauststr = textclauststr + " OFFSET :offsetparam"
+                wherebindjson['offsetparam'] = doffset
+            #log.logger.debug("textclauststr : %s" % textclauststr)
+            statement = text(textclauststr)
             log.logger.debug("The query Statement is: %s" % statement)
             include_count = False
             count_only = False
             record_count = 0
-            # add include_count
+            # include_count
             binclude_count = queryjson['include_count'] if 'include_count' in queryjson else None
             if binclude_count is not None and distutils.util.strtobool(str(binclude_count)):
                 include_count = True
-            # add count_only
+            # count_only
             bcount_only = queryjson['count_only'] if 'count_only' in queryjson else None
             if bcount_only is not None and distutils.util.strtobool(str(bcount_only)):
                 count_only = True
@@ -279,24 +288,26 @@ class {{ name }}Service(object):
                         pks = {{ name }}.getPrimaryKeys({{ name }})
                         qfields = "{{ name }}." + ",{{ name }}.".join(tuple(pks))
                         if len(qfields.split(',')) == 1:
-                            cstate = select([func.count(eval(qfields))])
+                            cqueryfields = "count(" + qfields + ") as rowcount"
                         else:
-                            cstate = select([func.count(eval(qfields.split(',')[0]))])
-                        # add distinct
-                        if "distinct" in queryjson:
-                            if bdistinct is not None and distutils.util.strtobool(str(bdistinct)):
-                                cstate = cstate.distinct()
-                        # add where
-                        if wherefields is not None:
-                            cstate = cstate.where(eval(wherefields))
+                            cqueryfields = "count(" + qfields.split(',')[0] + ") as rowcount"
+                        counttextclauststr = "SELECT "
+                        # distinct
+                        if bdistinct is not None and distutils.util.strtobool(str(bdistinct)):
+                            counttextclauststr = counttextclauststr + "DISTINCT "
+                        # field + from
+                        counttextclauststr = counttextclauststr + cqueryfields + " FROM " + tablename
+                        # where
+                        if (wherefields is not None) & (wherebind is not None):
+                            counttextclauststr = counttextclauststr + " WHERE " + wherefields
+                        cstate = text(counttextclauststr)
                         log.logger.debug("The record count query Statement is: %s" % cstate)
-                        record_count = session.exec(cstate).one()
-                        #log.logger.debug("RecordCount is: %s" % record_count)
+                        record_count = session.execute(cstate,wherebindjson).one()[0]
                     returnjson = {}
                     if count_only:
                         returnjson["record_count"] = record_count
                     else:
-                        result = session.exec(statement)
+                        result = session.execute(statement,wherebindjson)
                         data = []
                         rawdata = []
                         fields = ''
@@ -304,9 +315,8 @@ class {{ name }}Service(object):
                             rawdata.append(row._data)
                             fields = row._fields
                             data.append(row._asdict())
-                        # log.logger.debug('query_{{ name }}() result is : %s' % result)
+                        log.logger.debug('query_{{ name }}() result is : %s' % result)
                         if include_count:
-                            #returnjson = {"data": self.dump_model_list(result)}
                             returnjson["record_count"] = record_count
                             returnjson['fields'] = fields
                             returnjson['data'] = data
