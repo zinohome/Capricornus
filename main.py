@@ -289,8 +289,8 @@ if services_model >= 1:
                 - **table_name** (path): **Required** - Name of the table to perform operations on.
                 - **"queryfields"** (header): "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                 - **"distinct"** (header): 'False',  -- Optional , default['False'] - Return distinct result.
-                - **"where"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') | (Customers.household_income > 80001)) & (Customers.last_name != \'Stark\')'
-                - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number.asc(), Customers.household_income.desc()'
+                - **"where"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') OR (Customers.household_income > 80001)) & (Customers.last_name != \'Stark\')'
+                - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                 - **"group_by** (header)": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
                 - **"limit"** (header): 0,  -- Optional - Set to limit the filter results.
                 - **"offset"** (header): 0,  -- Optional - Set to offset the filter results to a particular record count.
@@ -341,8 +341,8 @@ if services_model >= 1:
                     {
                      "queryfields": "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                      "distinct": 'False',  -- Optional , default['False'] - Return distinct result.
-                     "where": "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') | (Customers.household_income > 80001)) & (Customers.last_name != \'Stark\')'
-                     "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number.asc(), Customers.household_income.desc()'
+                     "where": "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') OR (Customers.household_income > 80001)) AND (Customers.last_name != \'Stark\')'
+                     "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                      "group_by": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
                      "limit": 0,  -- Optional - Set to limit the filter results.
                      "offset": 0,  -- Optional - Set to offset the filter results to a particular record count.
@@ -482,8 +482,8 @@ else:
                 - **table_name** (path): **Required** - Name of the table to perform operations on.
                 - **"queryfields"** (header): "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                 - **"distinct"** (header): 'False',  -- Optional , default['False'] - Return distinct result.
-                - **"where"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') | (Customers.household_income > 80001)) & (Customers.last_name != \'Stark\')'
-                - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number.asc(), Customers.household_income.desc()'
+                - **"where"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') OR (Customers.household_income > 80001)) AND (Customers.last_name != \'Stark\')'
+                - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                 - **"group_by** (header)": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
                 - **"limit"** (header): 0,  -- Optional - Set to limit the filter results.
                 - **"offset"** (header): 0,  -- Optional - Set to offset the filter results to a particular record count.
@@ -535,8 +535,8 @@ else:
                     {
                      "queryfields": "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
                      "distinct": 'False',  -- Optional , default['False'] - Return distinct result.
-                     "where": "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') | (Customers.household_income > 80001)) & (Customers.last_name != \'Stark\')'
-                     "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number.asc(), Customers.household_income.desc()'
+                     "where": "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != \'Tony\') OR (Customers.household_income > 80001)) & (Customers.last_name != \'Stark\')'
+                     "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
                      "group_by": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
                      "limit": 0,  -- Optional - Set to limit the filter results.
                      "offset": 0,  -- Optional - Set to offset the filter results to a particular record count.
