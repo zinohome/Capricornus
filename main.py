@@ -710,7 +710,7 @@ if services_model >= 2:
         """
             Parameters
             - **table_name** (path): **Required** - Name of the table to perform operations on.
-            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id = 123) | (Customers.customer_id=234)'
+            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id = 123) AND (Customers.customer_id=234)'
         """
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in delete_data(), input data table_name: [%s]' % table_name)
@@ -888,7 +888,7 @@ else:
         """
             Parameters
             - **table_name** (path): **Required** - Name of the table to perform operations on.
-            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id = 123) | (Customers.customer_id=234)'
+            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id = 123) AND (Customers.customer_id=234)'
         """
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in delete_data(), input data table_name: [%s]' % table_name)
