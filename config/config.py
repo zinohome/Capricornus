@@ -20,7 +20,7 @@ class Config(object):
 
 class Application_Config(Config):
     app_name = config('app_name', default = 'Capricornus')
-    app_version = config('app_version', default = 'v2.1.1')
+    app_version = config('app_version', default = 'v2.1.2')
     app_description = config('app_description', default = 'Zero Code REST API for RDBMS')
     app_prefix = config('app_prefix', default = '/api/v2')
     app_cors_origins = config('app_cors_origins', default = '*')
