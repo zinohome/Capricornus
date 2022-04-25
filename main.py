@@ -394,7 +394,7 @@ if services_model >= 1:
         idqrytuple = tuple(zip(idfldtuple, idtuple))
         idstr = ''
         for idqry in idqrytuple:
-            idstr = idstr + "==".join(idqry) + ","
+            idstr = idstr + "=".join(idqry) + ","
         idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
         log.logger.debug('get_data_by_id() querystr: [%s]' % idwherestr)
         return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
@@ -429,7 +429,7 @@ if services_model >= 1:
         idstr = ''
         for key, value in tablequerybyid.data.items():
             keystr = key if operator.contains(key, table_name + '.') else table_name + '.' + key
-            idstr = idstr + keystr + "==" + str(value) + ","
+            idstr = idstr + keystr + "=" + str(value) + ","
         idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
         log.logger.debug('query_data_by_id() querystr: [%s]' % idwherestr)
         return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
@@ -589,7 +589,7 @@ else:
         idqrytuple = tuple(zip(idfldtuple, idtuple))
         idstr = ''
         for idqry in idqrytuple:
-            idstr = idstr + "==".join(idqry) + ","
+            idstr = idstr + "=".join(idqry) + ","
         idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
         log.logger.debug('get_data_by_id() querystr: [%s]' % idwherestr)
         return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
@@ -625,7 +625,7 @@ else:
         idstr = ''
         for key, value in tablequerybyid.data.items():
             keystr = key if operator.contains(key, table_name + '.') else table_name + '.' + key
-            idstr = idstr + keystr + "==" + str(value) + ","
+            idstr = idstr + keystr + "=" + str(value) + ","
         idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
         log.logger.debug('query_data_by_id() querystr: [%s]' % idwherestr)
         return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
@@ -700,7 +700,7 @@ if services_model >= 2:
         """
             Parameters
             - **table_name** (path): **Required** - Name of the table to perform operations on.
-            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id == 123) | (Customers.customer_id==234)'
+            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id = 123) | (Customers.customer_id=234)'
         """
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in delete_data(), input data table_name: [%s]' % table_name)
@@ -795,9 +795,9 @@ if services_model >= 2:
             if operator.contains(pkname, table_name + '.'):
                 spkname = pkname.replace(table_name + '.', "", 1)
             if maindbmeta.get_table_pk_qmneed(table_name, spkname):
-                idwherestr = idwherestr + "("+pkname+"=='"+idtuple[index]+"')"
+                idwherestr = idwherestr + "("+pkname+"='"+idtuple[index]+"')"
             else:
-                idwherestr = idwherestr + "("+pkname+"=="+idtuple[index]+")"
+                idwherestr = idwherestr + "("+pkname+"="+idtuple[index]+")"
             if index < idcount - 1:
                 idwherestr = idwherestr + " & "
         if idcount > 1:
@@ -878,7 +878,7 @@ else:
         """
             Parameters
             - **table_name** (path): **Required** - Name of the table to perform operations on.
-            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id == 123) | (Customers.customer_id==234)'
+            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id = 123) | (Customers.customer_id=234)'
         """
         log.logger.debug(
             'Access \'/_table/{table_name}\' : run in delete_data(), input data table_name: [%s]' % table_name)
@@ -975,9 +975,9 @@ else:
             if operator.contains(pkname, table_name + '.'):
                 spkname = pkname.replace(table_name + '.', "", 1)
             if maindbmeta.get_table_pk_qmneed(table_name, spkname):
-                idwherestr = idwherestr + "("+pkname+"=='"+idtuple[index]+"')"
+                idwherestr = idwherestr + "("+pkname+"='"+idtuple[index]+"')"
             else:
-                idwherestr = idwherestr + "("+pkname+"=="+idtuple[index]+")"
+                idwherestr = idwherestr + "("+pkname+"="+idtuple[index]+")"
             if index < idcount - 1:
                 idwherestr = idwherestr + " & "
         if idcount > 1:
