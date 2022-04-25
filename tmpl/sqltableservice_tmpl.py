@@ -221,11 +221,13 @@ class {{ name }}Service(object):
 
     def query_{{ name }}(self,querystr):
         tablename = "{{ name }}"
+        tablename-dot = "{{ name }}."
+        comma-tablename-dot= ",{{ name }}."
         if toolkit.validQueryJson(querystr):
             queryjson = json.loads(querystr)
             log.logger.debug('The query JSON is: %s' % queryjson)
             #queryfields
-            fullqueryfields = tablename+"." + ","+tablename+".".join(tuple({{ name }}.__fields__.keys()))
+            fullqueryfields = tablename-dot + comma-tablename-dot.join(tuple({{ name }}.__fields__.keys()))
             queryfields = fullqueryfields
             querystr = queryjson['queryfields'] if 'queryfields' in queryjson else None
             if querystr is not None:
