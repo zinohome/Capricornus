@@ -594,6 +594,11 @@ else:
             )
         dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
         dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+        #TODO
+        #add qmark at idfield automaticlly
+
+        #dataentitymodel = importlib.import_module('models.' + table_name.strip().lower())
+        #dataentity = getattr(dataentitymodel, table_name.strip())()
         idfldtuple = tuple(filter(None, idfield.replace(' ', '').split(',')))
         idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
         idqrytuple = tuple(zip(idfldtuple, idtuple))
