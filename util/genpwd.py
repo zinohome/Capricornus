@@ -23,9 +23,9 @@ def verify_password(plain_password, hashed_password):
 
 
 if __name__ == '__main__':
-    '''
+
     plain_password = 'passw0rd'
     hashed_password = get_password_hash(plain_password)
     print('The hashed password of [ %s ] is [ %s ]' % (plain_password, hashed_password))
     print('Verify again: [ %s ]' % verify_password(plain_password, hashed_password))
-    '''
+
