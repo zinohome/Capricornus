@@ -177,7 +177,7 @@ class Dbconfig(Collection):
                                         'db_use_schema': False,
                                         'db_username': 'root',
                                         'db_password': 'passw0rd',
-                                        'db_uri': 'sqlite:////Users/zhangjun/PycharmProjects/NewCapricornus/data/sample.db',
+                                        'db_uri': 'sqlite:////opt/Capricornus/data/sample.db',
                                         'db_exclude_tablespaces': 'SYSTEM,SYSAUX'}
                 Connection_Config_json = {'con_pool_size': 20,
                                           'con_max_overflow': 5,

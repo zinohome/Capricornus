@@ -20,3 +20,5 @@ config.search_path = BASE_DIR
 
 if __name__ == '__main__':
     pass
+    #config = decouple.AutoConfig()
+    #print(config('app_log_filename', default='capricornus.log'))
