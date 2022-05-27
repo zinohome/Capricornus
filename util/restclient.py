@@ -241,6 +241,7 @@ class CapricornusClient():
 if __name__ == '__main__':
     nc = CapricornusClient('admin', 'admin')
     log.debug(nc.user_login())
+    nc.renew_token()
     if nc.token_expired:
         nc.renew_token()
     if ( not nc.token_expired ) and ( nc.access_token is not None ):
