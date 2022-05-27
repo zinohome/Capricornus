@@ -1,5 +1,5 @@
 {
-  "title": "PageDefine",
+  "title": "Page",
   "type": "object",
   "format": "grid",
   "required": [
@@ -17,7 +17,8 @@
       "type": "string",
       "default": "Title",
       "options": {
-        "grid_columns": 4
+        "grid_columns": 4,
+        "input_height": "30px"
       }
     },
     "block_navtitle": {
@@ -25,7 +26,8 @@
       "type": "string",
       "default": "NavTitle",
       "options": {
-        "grid_columns": 4
+        "grid_columns": 4,
+        "input_height": "30px"
       }
     },
     "dt_display": {
@@ -37,7 +39,8 @@
       ],
       "default": "lightbox",
       "options": {
-        "grid_columns": 4
+        "grid_columns": 4,
+        "input_height": "30px"
       }
     },
     "dt_idSrc": {
@@ -45,7 +48,8 @@
       "type": "string",
       "default": "name",
       "options": {
-        "grid_columns": 4
+        "grid_columns": 4,
+        "input_height": "30px"
       }
     },
     "dt_order": {
@@ -53,7 +57,8 @@
       "type": "string",
       "default": "name",
       "options": {
-        "grid_columns": 4
+        "grid_columns": 4,
+        "input_height": "30px"
       }
     },
     "et_columns": {
@@ -67,21 +72,26 @@
         "5"
       ],
       "options": {
-        "grid_columns": 4
+        "grid_columns": 4,
+        "input_height": "30px"
       }
     },
     "et_fields": {
       "type": "array",
-      "format": "tabs",
-      "title": "FieldDefine",
+      "format": "tabs-top",
+      "title": "Field",
       "uniqueItems": true,
       "options": {
+        "disable_array_reorder": true,
+        "disable_array_delete_all_rows": true,
+        "disable_array_delete_last_row": true,
         "grid_columns": 12
       },
       "items": {
         "title": "FieldDefine",
         "type": "object",
         "headerTemplate": "{{ i1 }}-{{ self.name }}",
+        "format": "grid",
         "required": [
           "name",
           "label",
@@ -96,17 +106,29 @@
           "name": {
             "title": "Name",
             "type": "string",
-            "default": "name"
+            "default": "name",
+              "options": {
+                "grid_columns": 4,
+                "input_height": "30px"
+              }
           },
           "label": {
             "title": "Title",
             "type": "string",
-            "default": "title"
+            "default": "title",
+              "options": {
+                "grid_columns": 4,
+                "input_height": "30px"
+              }
           },
           "labelinfo": {
             "title": "Labelinfo",
             "type": "string",
-            "default": "labelinfo"
+            "default": "labelinfo",
+              "options": {
+                "grid_columns": 4,
+                "input_height": "30px"
+              }
           },
           "visible": {
             "title": "ShowInTable",
@@ -119,7 +141,9 @@
               "enum_titles": [
                 "Show",
                 "Hide"
-              ]
+              ],
+              "grid_columns": 4,
+              "input_height": "30px"
             },
             "default": "true"
           },
@@ -132,6 +156,10 @@
               "block",
               "full block"
             ],
+            "options": {
+              "grid_columns": 4,
+              "input_height": "30px"
+            },
             "default": "normal"
           },
           "type": {
@@ -149,19 +177,31 @@
               "textarea",
               "jsoneditor"
             ],
+            "options": {
+              "grid_columns": 4,
+              "input_height": "30px"
+            },
             "default": "text"
           },
           "options": {
             "title": "Options",
             "type": "string",
             "format": "textarea",
-            "default": "None"
+            "default": "None",
+            "options": {
+              "grid_columns": 6,
+              "input_height": "60px"
+            }
           },
           "def": {
             "title": "Define",
             "type": "string",
             "format": "textarea",
-            "default": "None"
+            "default": "None",
+            "options": {
+              "grid_columns": 6,
+              "input_height": "60px"
+            }
           }
         }
       }
@@ -172,6 +212,7 @@
       "default": "tbeditorForm",
       "options": {
         "grid_columns": 4,
+        "input_height": "30px",
         "grid_break": true
       }
     },
@@ -181,7 +222,8 @@
       "format": "textarea",
       "default": "None",
       "options": {
-        "grid_columns": 12
+        "grid_columns": 12,
+        "input_height": "60px"
       }
     },
     "formtemplate": {
@@ -190,7 +232,8 @@
       "format": "textarea",
       "default": "None",
       "options": {
-        "grid_columns": 12
+        "grid_columns": 12,
+        "input_height": "60px"
       }
     }
   }
