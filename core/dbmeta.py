@@ -20,6 +20,7 @@ from sqlalchemy.schema import MetaData,CreateTable
 from jinja2 import Environment, FileSystemLoader
 import simplejson as json
 from config.config import config
+from core.arangobase import capbase
 from core.dbconfig import configindb
 from core.metastore import Metastore
 from core.pagedef import Pagedef
@@ -143,6 +144,11 @@ class DBMeta(object):
         engine = dbengine.DBEngine().connect()
         inspector = inspect(engine)
         metadata = self.metadata
+        log.info('Init datastore ....')
+        if not capbase.has_collection(Metastore):
+            capbase.create_collection(Metastore)
+        if not capbase.has_collection(Pagedef):
+            capbase.create_collection(Pagedef)
         try:
             if metadata is not None:
                 log.debug("Generate Schema from : [ %s ] with db schema "
