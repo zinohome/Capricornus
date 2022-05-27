@@ -1,0 +1,197 @@
+{
+  "title": "PageDefine",
+  "type": "object",
+  "format": "grid",
+  "required": [
+    "block_title",
+    "block_navtitle",
+    "dt_display",
+    "dt_idSrc",
+    "dt_order",
+    "et_fields",
+    "et_columns"
+  ],
+  "properties": {
+    "block_title": {
+      "title": "Title",
+      "type": "string",
+      "default": "Title",
+      "options": {
+        "grid_columns": 4
+      }
+    },
+    "block_navtitle": {
+      "title": "NavTitle",
+      "type": "string",
+      "default": "NavTitle",
+      "options": {
+        "grid_columns": 4
+      }
+    },
+    "dt_display": {
+      "title": "Theme",
+      "type": "string",
+      "enum": [
+        "lightbox",
+        "envelope"
+      ],
+      "default": "lightbox",
+      "options": {
+        "grid_columns": 4
+      }
+    },
+    "dt_idSrc": {
+      "title": "KeyField",
+      "type": "string",
+      "default": "name",
+      "options": {
+        "grid_columns": 4
+      }
+    },
+    "dt_order": {
+      "title": "Order",
+      "type": "string",
+      "default": "name",
+      "options": {
+        "grid_columns": 4
+      }
+    },
+    "et_columns": {
+      "title": "Columns",
+      "type": "string",
+      "enum": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "options": {
+        "grid_columns": 4
+      }
+    },
+    "et_fields": {
+      "type": "array",
+      "format": "tabs",
+      "title": "FieldDefine",
+      "uniqueItems": true,
+      "options": {
+        "grid_columns": 12
+      },
+      "items": {
+        "title": "FieldDefine",
+        "type": "object",
+        "headerTemplate": "{{ i1 }}-{{ self.name }}",
+        "required": [
+          "name",
+          "label",
+          "labelinfo",
+          "visible",
+          "classname",
+          "type",
+          "options",
+          "def"
+        ],
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "default": "name"
+          },
+          "label": {
+            "title": "Title",
+            "type": "string",
+            "default": "title"
+          },
+          "labelinfo": {
+            "title": "Labelinfo",
+            "type": "string",
+            "default": "labelinfo"
+          },
+          "visible": {
+            "title": "ShowInTable",
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ],
+            "options": {
+              "enum_titles": [
+                "Show",
+                "Hide"
+              ]
+            },
+            "default": "true"
+          },
+          "classname": {
+            "title": "Width",
+            "type": "string",
+            "enum": [
+              "normal",
+              "full",
+              "block",
+              "full block"
+            ],
+            "default": "normal"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string",
+            "enum": [
+              "text",
+              "checkbox",
+              "datetime",
+              "hidden",
+              "password",
+              "radio",
+              "readonly",
+              "select",
+              "textarea",
+              "jsoneditor"
+            ],
+            "default": "text"
+          },
+          "options": {
+            "title": "Options",
+            "type": "string",
+            "format": "textarea",
+            "default": "None"
+          },
+          "def": {
+            "title": "Define",
+            "type": "string",
+            "format": "textarea",
+            "default": "None"
+          }
+        }
+      }
+    },
+    "formtemplatename": {
+      "title": "FormTemplateName",
+      "type": "string",
+      "default": "tbeditorForm",
+      "options": {
+        "grid_columns": 4,
+        "grid_break": true
+      }
+    },
+    "formcss": {
+      "title": "FormCSS",
+      "type": "string",
+      "format": "textarea",
+      "default": "None",
+      "options": {
+        "grid_columns": 12
+      }
+    },
+    "formtemplate": {
+      "title": "FormTemplate",
+      "type": "string",
+      "format": "textarea",
+      "default": "None",
+      "options": {
+        "grid_columns": 12
+      }
+    }
+  }
+}
