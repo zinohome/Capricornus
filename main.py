@@ -33,6 +33,9 @@ from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
 
 from core import dbmeta, security, apimodel, dbengine
 from admin.apps import login_manager
+from core.arangobase import capbase
+from core.metastore import Metastore
+from core.pagedef import Pagedef
 from core.users import Users
 from util.log import log as log
 from config.config import config
@@ -85,6 +88,11 @@ app.mount("/static", StaticFiles(directory="admin/apps/static"), name="static")
 @app.on_event("startup")
 async def startup_event():
     log.info(configindb.Application_Config['app_name'] + ' Starting ....')
+    log.info('Init datastore ....')
+    if not capbase.has_collection(Metastore):
+        capbase.create_collection(Metastore)
+    if not capbase.has_collection(Pagedef):
+        capbase.create_collection(Pagedef)
     apiusers.initsysUsers()
     if configindb.Application_Config['app_clear_metadat_on_startup']:
         clear_meta_cache()
