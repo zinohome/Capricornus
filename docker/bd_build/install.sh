@@ -3,7 +3,7 @@ set -e
 set -x
 apt-get update && DEBIAN_FRONTEND=noninteractive && \
 apt -y dist-upgrade && \
-apt-get install -y --no-install-recommends net-tools libsasl2-dev curl wget procps netcat git libnss3-tools python3-pip && \
+apt-get install -y --no-install-recommends build-essential libssl-dev libffi-dev python3-dev net-tools libsasl2-dev curl wget procps netcat git libnss3-tools python3-pip && \
 pip3 install virtualenv && \
 cd /opt && \
 git clone https://github.com/zinohome/Capricornus.git && \
