@@ -16,6 +16,11 @@ services:
     ports:
       - "8880:8880/tcp"
       - "8843:8843/tcp"
+    healthcheck:
+        test: ["CMD", "curl", "-fs", "http://localhost:8880/apidocs || exit 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
     networks:
       - capricornus
 
@@ -24,7 +29,7 @@ services:
     container_name: capricornus-arangodb
     hostname: capricornus-arangodb
     user: root
-    restart: unless-stopped
+    restart: on-failure
     volumes:
       - /data/arangodb/data/arangodb3:/var/lib/arangodb3
     environment:
@@ -32,7 +37,7 @@ services:
     ports:
       - "8529:8529/tcp"
     healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:8529/_db/_system/_admin/aardvark/index.html"]
+        test: ["CMD", "curl", "-fs", "http://localhost:8529/_db/_system/_admin/aardvark/index.html || exit 1"]
         interval: 10s
         timeout: 5s
         retries: 5
