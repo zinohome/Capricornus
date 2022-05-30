@@ -18,7 +18,7 @@ services:
       - "8843:8843/tcp"
     healthcheck:
         test: ["CMD", "curl", "-fs", "http://localhost:8880/apidocs || exit 1"]
-        interval: 10s
+        interval: 30s
         timeout: 5s
         retries: 5
     networks:
@@ -38,7 +38,7 @@ services:
       - "8529:8529/tcp"
     healthcheck:
         test: ["CMD", "netstat -anp | grep 8529 || exit 1"]
-        interval: 10s
+        interval: 30s
         timeout: 5s
         retries: 5
     networks:
