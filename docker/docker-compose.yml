@@ -31,6 +31,11 @@ services:
       ARANGO_ROOT_PASSWORD: "passw0rd"
     ports:
       - "8529:8529/tcp"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8529/_db/_system/_admin/aardvark/index.html"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
     networks:
       - capricornus
 
