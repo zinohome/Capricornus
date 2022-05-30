@@ -5,11 +5,13 @@ services:
     image: "jointhero/capricornus:latest"
     container_name: capricornus
     hostname: capricornus
-    restart: unless-stopped
+    restart: on-failure
     depends_on:
       - arangodb
+    links:
+      - arangodb
     environment:
-      arangodb_hosts: "http://capricornus-arangodb:8529"
+      arangodb_hosts: "http://arangodb:8529"
       app_profile: "demo"
     ports:
       - "8880:8880/tcp"
