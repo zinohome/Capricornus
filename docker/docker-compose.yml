@@ -17,7 +17,7 @@ services:
       - "8880:8880/tcp"
       - "8843:8843/tcp"
     healthcheck:
-        test: ["CMD", "curl", "--fail", "http://localhost:8880/apidocs", "||", "exit 1"]
+        test: ["CMD", "netstat", "-anp", "|", "grep 8880", "||", "exit 1"]
         interval: 30s
         timeout: 5s
         retries: 5
