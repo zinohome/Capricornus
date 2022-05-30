@@ -17,7 +17,7 @@ services:
       - "8880:8880/tcp"
       - "8843:8843/tcp"
     healthcheck:
-        test: ["CMD", "/usr/bin/curl --fail http://localhost:8880/apidocs || exit 1"]
+        test: ["CMD", "curl" "--fail" "http://localhost:8880/apidocs || exit 1"]
         interval: 30s
         timeout: 5s
         retries: 5
@@ -37,7 +37,7 @@ services:
     ports:
       - "8529:8529/tcp"
     healthcheck:
-        test: ["CMD", "/bin/netstat -anp | grep 8529 || exit 1"]
+        test: ["CMD", "netstat -anp | grep 8529 || exit 1"]
         interval: 30s
         timeout: 5s
         retries: 5
