@@ -1,26 +1,26 @@
 version: "3"
 
 services:
-  dashboard:
+  capricornus:
     image: "jointhero/capricornus:latest"
-    container_name: capricorus
-    hostname: capricorus
+    container_name: capricornus
+    hostname: capricornus
     restart: unless-stopped
     depends_on:
       - arangodb
     environment:
-      arangodb_hosts: "http://capricorus-arangodb:8529"
+      arangodb_hosts: "http://capricornus-arangodb:8529"
       app_profile: "demo"
     ports:
       - "8880:8880/tcp"
       - "8843:8843/tcp"
     networks:
-      - capricorus
+      - capricornus
 
   arangodb:
     image: "arangodb"
-    container_name: capricorus-arangodb
-    hostname: capricorus-arangodb
+    container_name: capricornus-arangodb
+    hostname: capricornus-arangodb
     user: root
     restart: unless-stopped
     volumes:
@@ -30,8 +30,8 @@ services:
     ports:
       - "8529:8529/tcp"
     networks:
-      - capricorus
+      - capricornus
 
 networks:
-  capricorus:
+  capricornus:
     driver: bridge
