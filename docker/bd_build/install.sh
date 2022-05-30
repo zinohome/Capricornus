@@ -20,6 +20,7 @@ virtualenv venv && \
 pip3 install -r requirements.txt && \
 pip3 uninstall -y simple_rest_client && \
 cd /opt/Capricornus && cp /bd_build/default_env /opt/Capricornus/.env && \
+cp /bd_build/wait-for /usr/bin/wait-for && chmod 755 /usr/bin/wait-for && \
 ls -l /opt/Capricornus/.env && cat /opt/Capricornus/.env && \
 cp /opt/Capricornus/docker/bd_build/50_start_capricornus-h.sh /etc/my_init.d/50_start_capricornus.sh && \
 chmod 755 /etc/my_init.d/50_start_capricornus.sh
