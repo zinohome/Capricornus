@@ -112,6 +112,15 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
+async def get_read_permission(current_user: User = Depends(get_current_user)):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    else:
+        if current_user.role.strip() == 'Superadmin' or current_user.role.strip() == 'Writer' or current_user.role.strip() == 'Reader':
+            return True
+        else:
+            raise HTTPException(status_code=400, detail="Permission denied")
+
 async def get_write_permission(current_user: User = Depends(get_current_user)):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")

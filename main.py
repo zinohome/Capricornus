@@ -244,447 +244,267 @@ async def get_dbddl():
     log.debug('Access \'/_schema/dbdll\' : run in get_dbdiagram()')
     return maindbmeta.response_dbdiagram("dbddl.sql")
 
-if services_model >= 1:
-    @app.get(prefix + "/_schema/database",
-             tags=["Schema"],
-             summary="Retrieve DbSchema Resources.",
-             description="By default, all tables are returned .",
-             )
-    async def get_schema():
-        log.debug('Access \'/_schema/database\' : run in get_schema()')
-        return maindbmeta.response_schema()
+@app.get(prefix + "/_schema/database",
+        tags=["Schema"],
+        summary="Retrieve DbSchema Resources.",
+        description="By default, all tables are returned .",
+        )
+async def get_schema(current_user_role: bool = True if services_model >= 1 else Depends(security.get_read_permission)):
+    log.debug('Access \'/_schema/database\' : run in get_schema()')
+    return maindbmeta.response_schema()
 
-    @app.get(prefix + "/_schema/_table/{table_name}",
-             tags=["Schema"],
-             summary="Retrieve table definition for the given table.",
-             description="This describes the table, its fields and indexes.",
-             )
-    async def get_table_schema(table_name: str):
-        log.debug('Access \'/_schema/_table/{table_name}\' : run in get_table_schema(), '
-                         'input data table_name: [%s]' % table_name)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        return maindbmeta.response_table_schema(table_name)
+@app.get(prefix + "/_schema/_table/{table_name}",
+        tags=["Schema"],
+        summary="Retrieve table definition for the given table.",
+        description="This describes the table, its fields and indexes.",
+        )
+async def get_table_schema(table_name: str,
+                           current_user_role: bool = True if services_model >= 1 else Depends(security.get_read_permission)):
+    log.debug('Access \'/_schema/_table/{table_name}\' : run in get_table_schema(), '
+              'input data table_name: [%s]' % table_name)
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    return maindbmeta.response_table_schema(table_name)
 
-    @app.get(prefix + "/_pagedef/_table/{table_name}",
-             tags=["Schema"],
-             summary="Retrieve table page definition for the given table.",
-             description="This describes the table page definition.",
-             )
-    async def get_table_pagdef(table_name: str):
-        log.debug('Access \'/_pagdef/_table/{table_name}\' : run in get_table_pagdef(), '
-                  'input data table_name: [%s]' % table_name)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        return maindbmeta.response_table_pagdef(table_name)
+@app.get(prefix + "/_pagedef/_table/{table_name}",
+        tags=["Schema"],
+        summary="Retrieve table page definition for the given table.",
+        description="This describes the table page definition.",
+        )
+async def get_table_pagdef(table_name: str,
+                           current_user_role: bool = True if services_model >= 1 else Depends(security.get_read_permission)):
+    log.debug('Access \'/_pagdef/_table/{table_name}\' : run in get_table_pagdef(), '
+              'input data table_name: [%s]' % table_name)
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    return maindbmeta.response_table_pagdef(table_name)
 
-    @app.get(prefix + "/_table/{table_name}",
-             tags=["Data - Table Level"],
-             summary="Retrieve one or more records. ",
-             description="",
-             )
-    async def get_data(table_name: str,
-                       queryfields: str = Header('*'),
-                       distinct: bool = Header(False),
-                       where_query: str = Header(None),
-                       where_bind: str = Header(None),
-                       order_by: str = Header(None),
-                       group_by: str = Header(None),
-                       limit: int = Header(configindb.Query_Config['query_default_limit'], gt=0,
-                                           le=configindb.Query_Config['query_limit_upset']),
-                       offset: int = Header(configindb.Query_Config['query_default_offset'], gt=-1),
-                       count_only: bool = Header(False),
-                       include_count: bool = Header(False)):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **"queryfields"** (header): "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
-                - **"distinct"** (header): 'False',  -- Optional , default['False'] - Return distinct result.
-                - **"where_query"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
-                - **"where_bind"** (header): "string",  -- Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
-                - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
-                - **"group_by** (header)": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
-                - **"limit"** (header): 0,  -- Optional - Set to limit the filter results.
-                - **"offset"** (header): 0,  -- Optional - Set to offset the filter results to a particular record count.
-                - **"count_only"** (header): 'False',  -- Optional , default['False'] - Return only the total number of filter results.
-                - **"include_count"** (header): 'True'  -- Optional , default['True'] - Include the total number of filter results in returned result.
-            """
-        log.debug(
-            'Access \'/_table/{table_name}\' : run in get_data(), input data table_name: [%s]' % table_name)
-        # log.debug('fieldlist: [%s]' % queryfields)
-        # log.debug('distinct: [%s]' % distinct)
-        # log.debug('where_query: [%s]' % where_query)
-        # log.debug('where_bind: [%s]' % where_bind)
-        # log.debug('order_by: [%s]' % order_by)
-        # log.debug('group_by: [%s]' % group_by)
-        # log.debug('limit: [%s]' % limit)
-        # log.debug('offset: [%s]' % offset)
-        # log.debug('count_only: [%s]' % count_only)
-        # log.debug('include_count: [%s]' % include_count)
-        queryjson = {}
-        queryjson['queryfields'] = queryfields
-        queryjson['distinct'] = distinct
-        queryjson['where_query'] = where_query
-        queryjson['where_bind'] = where_bind
-        queryjson['order_by'] = order_by
-        queryjson['group_by'] = group_by
-        queryjson['limit'] = limit
-        queryjson['offset'] = offset
-        queryjson['count_only'] = count_only
-        queryjson['include_count'] = include_count
-        log.debug('queryjson: [%s]' % queryjson)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'query_' + table_name.strip())(json.dumps(queryjson))
-
-    @app.post(prefix + "/_table/_query/{table_name}",
-              tags=["Data - Table Level"],
-              summary="Retrieve one or more records. ",
-              description="", )
-    async def query_data(table_name: str, tablequerybody: apimodel.TableQueryBody):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **request body: **Required**
-                ```
-                    {
-                     "queryfields": "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
-                     "distinct": 'False',  -- Optional , default['False'] - Return distinct result.
-                     "where_query": "string",  -- Optional - Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
-                     "where_bind": "string",  -- Optional - Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
-                     "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
-                     "group_by": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
-                     "limit": 0,  -- Optional - Set to limit the filter results.
-                     "offset": 0,  -- Optional - Set to offset the filter results to a particular record count.
-                     "count_only": 'False',  -- Optional , default['False'] - Return only the total number of filter results.
-                     "include_count": 'True'  -- Optional , default['True'] - Include the total number of filter results in returned result.
-                     }
-                ```
-            """
-        log.debug(
-            'Access \'/_table/_query{table_name}/\' : run in query_data(), input data table_name: [%s]' % table_name)
-        log.debug('body: [%s]' % tablequerybody.json())
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'query_' + table_name.strip())(tablequerybody.json())
-
-    @app.get(prefix + "/_table/{table_name}/{id}",
-             tags=["Data - Row Level"],
-             summary="Retrieve one record by identifier.",
-             description="",
-             )
-    async def get_data_by_id(table_name: str, id: str,
-                             idfield: str = Header(None)):
-        """
+@app.get(prefix + "/_table/{table_name}",
+        tags=["Data - Table Level"],
+        summary="Retrieve one or more records. ",
+        description="",
+        )
+async def get_data(table_name: str,
+                   queryfields: str = Header('*'),
+                   distinct: bool = Header(False),
+                   where_query: str = Header(None),
+                   where_bind: str = Header(None),
+                   order_by: str = Header(None),
+                   group_by: str = Header(None),
+                   limit: int = Header(configindb.Query_Config['query_default_limit'], gt=0,
+                                       le=configindb.Query_Config['query_limit_upset']),
+                   offset: int = Header(configindb.Query_Config['query_default_offset'], gt=-1),
+                   count_only: bool = Header(False),
+                   include_count: bool = Header(False),
+                   current_user_role: bool = True if services_model >= 1 else Depends(security.get_read_permission)):
+    """
             Parameters
             - **table_name** (path): **Required** - Name of the table to perform operations on.
-            - **id** (path): **Required** - The id value of identifier ex:10 , for mutiple ids, use ex: 10-20-……
-            - **idfield** (header): - Comma-delimited list of the fields used as identifiers. ex: 'Customers.id,Customers.id2'
+            - **"queryfields"** (header): "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
+            - **"distinct"** (header): 'False',  -- Optional , default['False'] - Return distinct result.
+            - **"where_query"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
+            - **"where_bind"** (header): "string",  -- Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
+            - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
+            - **"group_by** (header)": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
+            - **"limit"** (header): 0,  -- Optional - Set to limit the filter results.
+            - **"offset"** (header): 0,  -- Optional - Set to offset the filter results to a particular record count.
+            - **"count_only"** (header): 'False',  -- Optional , default['False'] - Return only the total number of filter results.
+            - **"include_count"** (header): 'True'  -- Optional , default['True'] - Include the total number of filter results in returned result.
         """
-        idfield = idfield if operator.contains(idfield, table_name + '.') else table_name + '.' + (
-                    ',' + table_name + '.').join(idfield.split(','))
-        log.debug(
-            'Access \'/_table/{table_name}/{id}\' : run in get_data_by_id(), input data table_name: [%s]' % table_name)
-        log.debug('idfield: [%s]' % idfield)
-        log.debug('id: [%s]' % id)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        idfldtuple = tuple(filter(None, idfield.replace(' ', '').split(',')))
-        idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
-        idqrytuple = tuple(zip(idfldtuple, idtuple))
-        idstr = ''
-        for idqry in idqrytuple:
-            idstr = idstr + "=".join(idqry) + ","
-        idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
-        log.debug('get_data_by_id() querystr: [%s]' % idwherestr)
-        return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
+    log.debug(
+        'Access \'/_table/{table_name}\' : run in get_data(), input data table_name: [%s]' % table_name)
+    # log.debug('fieldlist: [%s]' % queryfields)
+    # log.debug('distinct: [%s]' % distinct)
+    # log.debug('where_query: [%s]' % where_query)
+    # log.debug('where_bind: [%s]' % where_bind)
+    # log.debug('order_by: [%s]' % order_by)
+    # log.debug('group_by: [%s]' % group_by)
+    # log.debug('limit: [%s]' % limit)
+    # log.debug('offset: [%s]' % offset)
+    # log.debug('count_only: [%s]' % count_only)
+    # log.debug('include_count: [%s]' % include_count)
+    queryjson = {}
+    queryjson['queryfields'] = queryfields
+    queryjson['distinct'] = distinct
+    queryjson['where_query'] = where_query
+    queryjson['where_bind'] = where_bind
+    queryjson['order_by'] = order_by
+    queryjson['group_by'] = group_by
+    queryjson['limit'] = limit
+    queryjson['offset'] = offset
+    queryjson['count_only'] = count_only
+    queryjson['include_count'] = include_count
+    log.debug('queryjson: [%s]' % queryjson)
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
+    dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+    return getattr(dataservice, 'query_' + table_name.strip())(json.dumps(queryjson))
+
+@app.post(prefix + "/_table/_query/{table_name}",
+        tags=["Data - Table Level"],
+        summary="Retrieve one or more records. ",
+        description="", )
+async def query_data(table_name: str, tablequerybody: apimodel.TableQueryBody,
+                     current_user_role: bool = True if services_model >= 1 else Depends(security.get_read_permission)):
+    """
+            Parameters
+            - **table_name** (path): **Required** - Name of the table to perform operations on.
+            - **request body: **Required**
+            ```
+                {
+                 "queryfields": "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
+                 "distinct": 'False',  -- Optional , default['False'] - Return distinct result.
+                 "where_query": "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
+                 "where_bind": "string",  -- Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
+                 "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
+                 "group_by": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
+                 "limit": 0,  -- Optional - Set to limit the filter results.
+                 "offset": 0,  -- Optional - Set to offset the filter results to a particular record count.
+                 "count_only": 'False',  -- Optional , default['False'] - Return only the total number of filter results.
+                 "include_count": 'True'  -- Optional , default['True'] - Include the total number of filter results in returned result.
+                 }
+            ```
+        """
+    log.debug(
+        'Access \'/_table/_query{table_name}/\' : run in query_data(), input data table_name: [%s]' % table_name)
+    log.debug('body: [%s]' % tablequerybody.json())
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
+    dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+    return getattr(dataservice, 'query_' + table_name.strip())(tablequerybody.json())
+
+@app.get(prefix + "/_table/{table_name}/{id}",
+        tags=["Data - Row Level"],
+        summary="Retrieve one record by identifier.",
+        description="",
+        )
+async def get_data_by_id(table_name: str, id: str,
+                         idfield: str = Header(None),
+                         current_user_role: bool = True if services_model >= 1 else Depends(security.get_read_permission)):
+    """
+        Parameters
+        - **table_name** (path): **Required** - Name of the table to perform operations on.
+        - **id** (path): **Required** - The id value of identifier ex:10 , for mutiple ids, use ex: 10-20-……
+        - **idfield** (header): - Comma-delimited list of the fields used as identifiers. ex: 'Customers.id,Customers.id2'
+    """
+    idfield = idfield if operator.contains(idfield, table_name + '.') else table_name + '.' + (
+            ',' + table_name + '.').join(idfield.split(','))
+    log.debug(
+        'Access \'/_table/{table_name}/{id}\' : run in get_data_by_id(), input data table_name: [%s]' % table_name)
+    log.debug('idfield: [%s]' % idfield)
+    log.debug('id: [%s]' % id)
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
+    dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+    # TODO
+    # add qmark at idfield automaticlly
+
+    # dataentitymodel = importlib.import_module('models.' + table_name.strip().lower())
+    # dataentity = getattr(dataentitymodel, table_name.strip())()
+    idfldtuple = tuple(filter(None, idfield.replace(' ', '').split(',')))
+    idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
+    idqrytuple = tuple(zip(idfldtuple, idtuple))
+    idstr = ''
+    for idqry in idqrytuple:
+        idstr = idstr + "=".join(idqry) + ","
+    idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
+    log.debug('get_data_by_id() querystr: [%s]' % idwherestr)
+    return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
 
 
-    @app.post(prefix + "/_table/_querybyid/{table_name}",
+@app.post(prefix + "/_table/_querybyid/{table_name}",
               tags=["Data - Row Level"],
               summary="Retrieve one record by identifier.",
               description="",
               )
-    async def query_data_by_id(table_name: str, tablequerybyid: apimodel.RecordBody):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **request body: Required**
-                ```
-                    {
-                     "data": {string}  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '{"Customers.customer_id":10,"Customers.ex_key_id":111}'
-                     }
-                ```
-        """
-        log.debug(
-            'Access \'/_table/{table_name}/querybyid\' : run in query_data_by_id(), input data table_name: [%s]' % table_name)
-        log.debug('body: [%s]' % tablequerybyid)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        idstr = ''
-        for key, value in tablequerybyid.data.items():
-            keystr = key if operator.contains(key, table_name + '.') else table_name + '.' + key
-            idstr = idstr + keystr + "=" + str(value) + ","
-        idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
-        log.debug('query_data_by_id() querystr: [%s]' % idwherestr)
-        return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
-
-else:
-    @app.get(prefix + "/_schema/database",
-             tags=["Schema"],
-             summary="Retrieve DbSchema Resources.",
-             description="By default, all tables are returned .",
-             )
-    async def get_schema(current_user: security.User = Depends(security.get_current_active_user)):
-        log.debug('Access \'/_schema/database\' : run in get_schema()')
-        return maindbmeta.response_schema()
-
-    @app.get(prefix + "/_schema/_table/{table_name}",
-             tags=["Schema"],
-             summary="Retrieve table definition for the given table.",
-             description="This describes the table, its fields and indexes.",
-             )
-    async def get_table_schema(table_name: str,
-                               current_user: security.User = Depends(security.get_current_active_user)):
-        log.debug('Access \'/_schema/_table/{table_name}\' : run in get_table_schema(), '
-                         'input data table_name: [%s]' % table_name)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        return maindbmeta.response_table_schema(table_name)
-
-    @app.get(prefix + "/_pagedef/_table/{table_name}",
-             tags=["Schema"],
-             summary="Retrieve table page definition for the given table.",
-             description="This describes the table page definition.",
-             )
-    async def get_table_pagdef(table_name: str,
-                               current_user: security.User = Depends(security.get_current_active_user)):
-        log.debug('Access \'/_pagdef/_table/{table_name}\' : run in get_table_pagdef(), '
-                  'input data table_name: [%s]' % table_name)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        return maindbmeta.response_table_pagdef(table_name)
-
-    @app.get(prefix + "/_table/{table_name}",
-             tags=["Data - Table Level"],
-             summary="Retrieve one or more records. ",
-             description="",
-             )
-    async def get_data(table_name: str,
-                       queryfields: str = Header('*'),
-                       distinct: bool = Header(False),
-                       where_query: str = Header(None),
-                       where_bind: str = Header(None),
-                       order_by: str = Header(None),
-                       group_by: str = Header(None),
-                       limit: int = Header(configindb.Query_Config['query_default_limit'], gt=0,
-                                           le=configindb.Query_Config['query_limit_upset']),
-                       offset: int = Header(configindb.Query_Config['query_default_offset'], gt=-1),
-                       count_only: bool = Header(False),
-                       include_count: bool = Header(False),
-                       current_user: security.User = Depends(security.get_current_active_user)):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **"queryfields"** (header): "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
-                - **"distinct"** (header): 'False',  -- Optional , default['False'] - Return distinct result.
-                - **"where_query"** (header): "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
-                - **"where_bind"** (header): "string",  -- Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
-                - **"order_by** (header)": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
-                - **"group_by** (header)": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
-                - **"limit"** (header): 0,  -- Optional - Set to limit the filter results.
-                - **"offset"** (header): 0,  -- Optional - Set to offset the filter results to a particular record count.
-                - **"count_only"** (header): 'False',  -- Optional , default['False'] - Return only the total number of filter results.
-                - **"include_count"** (header): 'True'  -- Optional , default['True'] - Include the total number of filter results in returned result.
-            """
-        log.debug(
-            'Access \'/_table/{table_name}\' : run in get_data(), input data table_name: [%s]' % table_name)
-        # log.debug('fieldlist: [%s]' % queryfields)
-        # log.debug('distinct: [%s]' % distinct)
-        # log.debug('where_query: [%s]' % where_query)
-        # log.debug('where_bind: [%s]' % where_bind)
-        # log.debug('order_by: [%s]' % order_by)
-        # log.debug('group_by: [%s]' % group_by)
-        # log.debug('limit: [%s]' % limit)
-        # log.debug('offset: [%s]' % offset)
-        # log.debug('count_only: [%s]' % count_only)
-        # log.debug('include_count: [%s]' % include_count)
-        queryjson = {}
-        queryjson['queryfields'] = queryfields
-        queryjson['distinct'] = distinct
-        queryjson['where_query'] = where_query
-        queryjson['where_bind'] = where_bind
-        queryjson['order_by'] = order_by
-        queryjson['group_by'] = group_by
-        queryjson['limit'] = limit
-        queryjson['offset'] = offset
-        queryjson['count_only'] = count_only
-        queryjson['include_count'] = include_count
-        log.debug('queryjson: [%s]' % queryjson)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'query_' + table_name.strip())(json.dumps(queryjson))
-
-    @app.post(prefix + "/_table/_query/{table_name}",
-              tags=["Data - Table Level"],
-              summary="Retrieve one or more records. ",
-              description="", )
-    async def query_data(table_name: str, tablequerybody: apimodel.TableQueryBody,
-                         current_user: security.User = Depends(security.get_current_active_user)):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **request body: **Required**
-                ```
-                    {
-                     "queryfields": "string",  -- Optional - Comma-delimited list of properties to be returned for each resource, "*" returns all properties. ex: 'Customers.first_name,Customers.last_name'
-                     "distinct": 'False',  -- Optional , default['False'] - Return distinct result.
-                     "where_query": "string",  -- Optional - SQL-like filter to limit the records to retrieve. ex: '((Customers.first_name != :first_name) OR (Customers.household_income > :household_income)) AND (Customers.last_name != :last_name)'
-                     "where_bind": "string",  -- Optional - SQL-like filter Parameter to limit the records to retrieve. ex: "first_name='Tony',household_income=8100,last_name='Stark'"
-                     "order_by": "string",  -- Optional - SQL-like order containing field and direction for filter results. ex: 'Customers.phone_number ASC, Customers.household_income DESC'
-                     "group_by": "string",  -- Optional - Comma-delimited list of the fields used for grouping of filter results. ex: 'Customers.last_name'
-                     "limit": 0,  -- Optional - Set to limit the filter results.
-                     "offset": 0,  -- Optional - Set to offset the filter results to a particular record count.
-                     "count_only": 'False',  -- Optional , default['False'] - Return only the total number of filter results.
-                     "include_count": 'True'  -- Optional , default['True'] - Include the total number of filter results in returned result.
-                     }
-                ```
-            """
-        log.debug(
-            'Access \'/_table/_query{table_name}/\' : run in query_data(), input data table_name: [%s]' % table_name)
-        log.debug('body: [%s]' % tablequerybody.json())
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'query_' + table_name.strip())(tablequerybody.json())
-
-    @app.get(prefix + "/_table/{table_name}/{id}",
-             tags=["Data - Row Level"],
-             summary="Retrieve one record by identifier.",
-             description="",
-             )
-    async def get_data_by_id(table_name: str, id: str,
-                             idfield: str = Header(None),
-                             current_user: security.User = Depends(security.get_current_active_user)):
-        """
+async def query_data_by_id(table_name: str, tablequerybyid: apimodel.RecordBody,
+                           current_user_role: bool = True if services_model >= 1 else Depends(security.get_read_permission)):
+    """
             Parameters
             - **table_name** (path): **Required** - Name of the table to perform operations on.
-            - **id** (path): **Required** - The id value of identifier ex:10 , for mutiple ids, use ex: 10-20-……
-            - **idfield** (header): - Comma-delimited list of the fields used as identifiers. ex: 'Customers.id,Customers.id2'
-        """
-        idfield = idfield if operator.contains(idfield, table_name + '.') else table_name + '.' + (
-                    ',' + table_name + '.').join(idfield.split(','))
-        log.debug(
-            'Access \'/_table/{table_name}/{id}\' : run in get_data_by_id(), input data table_name: [%s]' % table_name)
-        log.debug('idfield: [%s]' % idfield)
-        log.debug('id: [%s]' % id)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        #TODO
-        #add qmark at idfield automaticlly
-
-        #dataentitymodel = importlib.import_module('models.' + table_name.strip().lower())
-        #dataentity = getattr(dataentitymodel, table_name.strip())()
-        idfldtuple = tuple(filter(None, idfield.replace(' ', '').split(',')))
-        idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
-        idqrytuple = tuple(zip(idfldtuple, idtuple))
-        idstr = ''
-        for idqry in idqrytuple:
-            idstr = idstr + "=".join(idqry) + ","
-        idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
-        log.debug('get_data_by_id() querystr: [%s]' % idwherestr)
-        return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
+            - **request body: Required**
+            ```
+                {
+                 "data": {string}  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '{"Customers.customer_id":10,"Customers.ex_key_id":111}'
+                 }
+            ```
+    """
+    log.debug(
+        'Access \'/_table/{table_name}/querybyid\' : run in query_data_by_id(), input data table_name: [%s]' % table_name)
+    log.debug('body: [%s]' % tablequerybyid)
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
+    dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+    idstr = ''
+    for key, value in tablequerybyid.data.items():
+        keystr = key if operator.contains(key, table_name + '.') else table_name + '.' + key
+        idstr = idstr + keystr + "=" + str(value) + ","
+    idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
+    log.debug('query_data_by_id() querystr: [%s]' % idwherestr)
+    return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
 
 
-    @app.post(prefix + "/_table/_querybyid/{table_name}",
-              tags=["Data - Row Level"],
-              summary="Retrieve one record by identifier.",
-              description="",
-              )
-    async def query_data_by_id(table_name: str, tablequerybyid: apimodel.RecordBody,
-                               current_user: security.User = Depends(security.get_current_active_user)):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **request body: Required**
-                ```
-                    {
-                     "data": {string}  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '{"Customers.customer_id":10,"Customers.ex_key_id":111}'
-                     }
-                ```
-        """
-        log.debug(
-            'Access \'/_table/{table_name}/querybyid\' : run in query_data_by_id(), input data table_name: [%s]' % table_name)
-        log.debug('body: [%s]' % tablequerybyid)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        idstr = ''
-        for key, value in tablequerybyid.data.items():
-            keystr = key if operator.contains(key, table_name + '.') else table_name + '.' + key
-            idstr = idstr + keystr + "=" + str(value) + ","
-        idwherestr = "(" + ") & (".join(tuple(filter(None, idstr.replace(' ', '').split(',')))) + ")"
-        log.debug('query_data_by_id() querystr: [%s]' % idwherestr)
-        return getattr(dataservice, 'get_' + table_name.strip() + '_byid')(idwherestr)
+@app.post(prefix + "/_table/{table_name}",
+        tags=["Data - Table Level"],
+        summary="Create one or more records.",
+        description="",
+        )
+async def post_data(table_name: str, tablepost: apimodel.TableBody,
+                    current_user_role: bool = True if services_model >= 2 else Depends(security.get_write_permission)):
+    """
+        Parameters
+        - **table_name** (path): **Required** - Name of the table to perform operations on.
+        - **request body: Required**
+        ```
+            {
+             "data": [{"name":"jack","phone":"55789"}]  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '[{"name":"jack","phone":"55789"}]'
+             }
+        ```
+    """
+    log.debug(
+        'Access \'/_table/{table_name}\' : run in post_data(), input data table_name: [%s]' % table_name)
+    log.debug('body data: [%s]' % tablepost.json())
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
+    dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+    return getattr(dataservice, 'batch_create_' + table_name.strip() + '_byjson')(tablepost.json())
 
-if services_model >= 2:
-    @app.post(prefix + "/_table/{table_name}",
-              tags=["Data - Table Level"],
-              summary="Create one or more records.",
-              description="",
-              )
-    async def post_data(table_name: str, tablepost: apimodel.TableBody):
-        """
+
+@app.put(prefix + "/_table/{table_name}",
+        tags=["Data - Table Level"],
+        summary="Update (replace) one or more records.",
+        description="",
+        deprecated=False
+        )
+async def put_data(table_name: str, tableput: apimodel.TableBody,
+                   current_user_role: bool = True if services_model >= 2 else Depends(security.get_write_permission)):
+    """
             Parameters
             - **table_name** (path): **Required** - Name of the table to perform operations on.
             - **request body: Required**
@@ -693,344 +513,135 @@ if services_model >= 2:
                  "data": [{"name":"jack","phone":"55789"}]  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '[{"name":"jack","phone":"55789"}]'
                  }
             ```
-        """
-        log.debug(
-            'Access \'/_table/{table_name}\' : run in post_data(), input data table_name: [%s]' % table_name)
-        log.debug('body data: [%s]' % tablepost.json())
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
+    """
+    log.debug(
+        'Access \'/_table/{table_name}\' : run in put_data(), input data table_name: [%s]' % table_name)
+    log.debug('body: [%s]' % tableput.json())
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
+    dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+    return getattr(dataservice, 'batch_update_' + table_name.strip() + '_byjson')(tableput.json())
+
+@app.delete(prefix + "/_table/{table_name}",
+            tags=["Data - Table Level"],
+            summary="Delete one or more records.",
+            description="",
             )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'batch_create_' + table_name.strip() + '_byjson')(tablepost.json())
+async def delete_data(table_name: str,
+                      filterstr: str = Header(None),
+                      current_user_role: bool = True if services_model >= 2 else Depends(security.get_write_permission)):
+    """
+        Parameters
+        - **table_name** (path): **Required** - Name of the table to perform operations on.
+        - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id = 123) AND (Customers.customer_id=234)'
+    """
+    log.debug(
+        'Access \'/_table/{table_name}\' : run in delete_data(), input data table_name: [%s]' % table_name)
+    log.debug('filter: [%s]' % filterstr)
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
+    dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+    return getattr(dataservice, 'delete_' + table_name.strip() + '_byid')(filterstr)
 
 
-    @app.put(prefix + "/_table/{table_name}",
-             tags=["Data - Table Level"],
-             summary="Update (replace) one or more records.",
-             description="",
-             deprecated=False
-             )
-    async def put_data(table_name: str, tableput: apimodel.TableBody):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **request body: Required**
-                ```
-                    {
-                     "data": [{"name":"jack","phone":"55789"}]  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '[{"name":"jack","phone":"55789"}]'
-                     }
-                ```
-        """
-        log.debug(
-            'Access \'/_table/{table_name}\' : run in put_data(), input data table_name: [%s]' % table_name)
-        log.debug('body: [%s]' % tableput.json())
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'batch_update_' + table_name.strip() + '_byjson')(tableput.json())
-
-
-    @app.delete(prefix + "/_table/{table_name}",
-                tags=["Data - Table Level"],
-                summary="Delete one or more records.",
-                description="",
-                )
-    async def delete_data(table_name: str,
-                          filterstr: str = Header(None)):
-        """
-            Parameters
-            - **table_name** (path): **Required** - Name of the table to perform operations on.
-            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id = 123) AND (Customers.customer_id=234)'
-        """
-        log.debug(
-            'Access \'/_table/{table_name}\' : run in delete_data(), input data table_name: [%s]' % table_name)
-        log.debug('filter: [%s]' % filterstr)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'delete_' + table_name.strip() + '_byid')(filterstr)
-
-
-    @app.put(prefix + "/_table/{table_name}/{id}",
-             tags=["Data - Row Level"],
-             summary="Replace the content of one record by identifier.",
-             description="",
-             )
-    async def put_data_by_id(table_name: str, id: str,
-                             tableputbyid: apimodel.PutRecordBody):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **id** (path): **Required** - The id value of identifier ex:10 , for mutiple ids, use ex: 10-20-……
-                - **request body: Required**
-                ```
-                    {
-                     "data": {"name":"jack","phone":"55789"},  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '{"name":"jack","phone":"55789"}'
-                     "ids": {string}  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '"Customers.customer_id,Customers.ex_key_id"'
-                     }
-                ```
-            """
-        log.debug(
-            'Access \'/_table/{table_name}/{id}\' : run in put_data_by_id(), input data table_name: [%s]' % table_name)
-        log.debug('body: [%s]' % tableputbyid)
-        log.debug('id: [%s]' % id)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        updateentity = tableputbyid.data
-        idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
-        idstrtuple = tuple(filter(None, tableputbyid.ids.replace(' ', '').split(',')))
-        idkvtuple = tuple(zip(idstrtuple, idtuple))
-        ikdv = dict((x, y) for x, y in idkvtuple)
-        for key, value in ikdv.items():
-            # log.debug(key + '=' + value)
-            if operator.contains(key, table_name + '.'):
-                updateentity[key.replace(table_name + '.',"",1)] = value
-            else:
-                updateentity[key] = value
-        return getattr(dataservice, 'update_' + table_name.strip() + '_byjson')(updateentity)
-
-
-    @app.delete(prefix + "/_table/{table_name}/{id}",
-                tags=["Data - Row Level"],
-                summary="Delete one record by identifier.",
-                description="",
-                )
-    async def delete_data_by_id(table_name: str, id: str,
-                                idfield: str = Header(None, max_length=200)):
-        """
+@app.put(prefix + "/_table/{table_name}/{id}",
+        tags=["Data - Row Level"],
+        summary="Replace the content of one record by identifier.",
+        description="",
+        )
+async def put_data_by_id(table_name: str, id: str,
+                         tableputbyid: apimodel.PutRecordBody,
+                         current_user_role: bool = True if services_model >= 2 else Depends(security.get_write_permission)):
+    """
             Parameters
             - **table_name** (path): **Required** - Name of the table to perform operations on.
             - **id** (path): **Required** - The id value of identifier ex:10 , for mutiple ids, use ex: 10-20-……
-            - **idfield** (header): - Comma-delimited list of the fields used as identifiers. ex: 'Customers.id,Customers.id2'
-        """
-        idfield = idfield if operator.contains(idfield, table_name + '.') else table_name + '.' + (
-                    ',' + table_name + '.').join(idfield.split(','))
-        log.debug(
-            'Access \'/_table/{table_name}/{id}\' : run in delete_data_by_id(), input data table_name: [%s]' % table_name)
-        log.debug('id: [%s]' % id)
-        log.debug('idfield: [%s]' % idfield)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        idfldtuple = tuple(filter(None, idfield.replace(' ', '').split(',')))
-        idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
-        idcount = len(idfldtuple)
-        idwherestr =''
-        for index in range(idcount):
-            pkname = idfldtuple[index]
-            spkname = pkname
-            if operator.contains(pkname, table_name + '.'):
-                spkname = pkname.replace(table_name + '.', "", 1)
-            if maindbmeta.get_table_pk_qmneed(table_name, spkname):
-                idwherestr = idwherestr + "("+pkname+"='"+idtuple[index]+"')"
-            else:
-                idwherestr = idwherestr + "("+pkname+"="+idtuple[index]+")"
-            if index < idcount - 1:
-                idwherestr = idwherestr + " & "
-        if idcount > 1:
-            idwherestr = "(" + idwherestr + ")"
-        log.debug('delete_data_by_id() querystr: [%s]' % idwherestr)
-        return getattr(dataservice, 'delete_' + table_name.strip() + '_byid')(idwherestr)
-
-else:
-    @app.post(prefix + "/_table/{table_name}",
-              tags=["Data - Table Level"],
-              summary="Create one or more records.",
-              description="",
-              )
-    async def post_data(table_name: str, tablepost: apimodel.TableBody,
-                        current_user_role: bool = Depends(security.get_write_permission)):
-        """
-            Parameters
-            - **table_name** (path): **Required** - Name of the table to perform operations on.
             - **request body: Required**
             ```
                 {
-                 "data": [{"name":"jack","phone":"55789"}]  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '[{"name":"jack","phone":"55789"}]'
+                 "data": {"name":"jack","phone":"55789"},  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '{"name":"jack","phone":"55789"}'
+                 "ids": {string}  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '"Customers.customer_id,Customers.ex_key_id"'
                  }
             ```
         """
-        log.debug(
-            'Access \'/_table/{table_name}\' : run in post_data(), input data table_name: [%s]' % table_name)
-        log.debug('body data: [%s]' % tablepost.json())
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
+    log.debug(
+        'Access \'/_table/{table_name}/{id}\' : run in put_data_by_id(), input data table_name: [%s]' % table_name)
+    log.debug('body: [%s]' % tableputbyid)
+    log.debug('id: [%s]' % id)
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
+    dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+    updateentity = tableputbyid.data
+    idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
+    idstrtuple = tuple(filter(None, tableputbyid.ids.replace(' ', '').split(',')))
+    idkvtuple = tuple(zip(idstrtuple, idtuple))
+    ikdv = dict((x, y) for x, y in idkvtuple)
+    for key, value in ikdv.items():
+        # log.debug(key + '=' + value)
+        if operator.contains(key, table_name + '.'):
+            updateentity[key.replace(table_name + '.', "", 1)] = value
+        else:
+            updateentity[key] = value
+    return getattr(dataservice, 'update_' + table_name.strip() + '_byjson')(updateentity)
+
+@app.delete(prefix + "/_table/{table_name}/{id}",
+            tags=["Data - Row Level"],
+            summary="Delete one record by identifier.",
+            description="",
             )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'batch_create_' + table_name.strip() + '_byjson')(tablepost.json())
-
-
-    @app.put(prefix + "/_table/{table_name}",
-             tags=["Data - Table Level"],
-             summary="Update (replace) one or more records.",
-             description="",
-             deprecated=False
-             )
-    async def put_data(table_name: str, tableput: apimodel.TableBody,
-                       current_user_role: bool = Depends(security.get_write_permission)):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **request body: Required**
-                ```
-                    {
-                     "data": [{"name":"jack","phone":"55789"}]  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '[{"name":"jack","phone":"55789"}]'
-                     }
-                ```
-        """
-        log.debug(
-            'Access \'/_table/{table_name}\' : run in put_data(), input data table_name: [%s]' % table_name)
-        log.debug('body: [%s]' % tableput.json())
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'batch_update_' + table_name.strip() + '_byjson')(tableput.json())
-
-
-    @app.delete(prefix + "/_table/{table_name}",
-                tags=["Data - Table Level"],
-                summary="Delete one or more records.",
-                description="",
-                )
-    async def delete_data(table_name: str,
-                          filterstr: str = Header(None),
-                          current_user_role: bool = Depends(security.get_write_permission)):
-        """
-            Parameters
-            - **table_name** (path): **Required** - Name of the table to perform operations on.
-            - **filterstr** (header): Optional - SQL-like filter string to limit the records to retrieve. ex: '(Customers.customer_id = 123) AND (Customers.customer_id=234)'
-        """
-        log.debug(
-            'Access \'/_table/{table_name}\' : run in delete_data(), input data table_name: [%s]' % table_name)
-        log.debug('filter: [%s]' % filterstr)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        return getattr(dataservice, 'delete_' + table_name.strip() + '_byid')(filterstr)
-
-
-    @app.put(prefix + "/_table/{table_name}/{id}",
-             tags=["Data - Row Level"],
-             summary="Replace the content of one record by identifier.",
-             description="",
-             )
-    async def put_data_by_id(table_name: str, id: str,
-                             tableputbyid: apimodel.PutRecordBody,
-                             current_user_role: bool = Depends(security.get_write_permission)):
-        """
-                Parameters
-                - **table_name** (path): **Required** - Name of the table to perform operations on.
-                - **id** (path): **Required** - The id value of identifier ex:10 , for mutiple ids, use ex: 10-20-……
-                - **request body: Required**
-                ```
-                    {
-                     "data": {"name":"jack","phone":"55789"},  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '{"name":"jack","phone":"55789"}'
-                     "ids": {string}  -- **Required** - Json formated fieldname-fieldvalue pair. ex: '"Customers.customer_id,Customers.ex_key_id"'
-                     }
-                ```
-            """
-        log.debug(
-            'Access \'/_table/{table_name}/{id}\' : run in put_data_by_id(), input data table_name: [%s]' % table_name)
-        log.debug('body: [%s]' % tableputbyid)
-        log.debug('id: [%s]' % id)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        updateentity = tableputbyid.data
-        idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
-        idstrtuple = tuple(filter(None, tableputbyid.ids.replace(' ', '').split(',')))
-        idkvtuple = tuple(zip(idstrtuple, idtuple))
-        ikdv = dict((x, y) for x, y in idkvtuple)
-        for key, value in ikdv.items():
-            # log.debug(key + '=' + value)
-            if operator.contains(key, table_name + '.'):
-                updateentity[key.replace(table_name + '.',"",1)] = value
-            else:
-                updateentity[key] = value
-        return getattr(dataservice, 'update_' + table_name.strip() + '_byjson')(updateentity)
-
-
-    @app.delete(prefix + "/_table/{table_name}/{id}",
-                tags=["Data - Row Level"],
-                summary="Delete one record by identifier.",
-                description="",
-                )
-    async def delete_data_by_id(table_name: str, id: str,
-                                idfield: str = Header(None, max_length=200),
-                                current_user_role: bool = Depends(security.get_write_permission)):
-        """
-            Parameters
-            - **table_name** (path): **Required** - Name of the table to perform operations on.
-            - **id** (path): **Required** - The id value of identifier ex:10 , for mutiple ids, use ex: 10-20-……
-            - **idfield** (header): - Comma-delimited list of the fields used as identifiers. ex: 'Customers.id,Customers.id2'
-        """
-        idfield = idfield if operator.contains(idfield, table_name + '.') else table_name + '.' + (
-                    ',' + table_name + '.').join(idfield.split(','))
-        log.debug(
-            'Access \'/_table/{table_name}/{id}\' : run in delete_data_by_id(), input data table_name: [%s]' % table_name)
-        log.debug('id: [%s]' % id)
-        log.debug('idfield: [%s]' % idfield)
-        if not maindbmeta.check_table_schema(table_name):
-            raise HTTPException(
-                status_code=HTTP_404_NOT_FOUND,
-                detail='Table [ %s ] not found' % table_name
-            )
-        dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
-        dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
-        idfldtuple = tuple(filter(None, idfield.replace(' ', '').split(',')))
-        idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
-        idcount = len(idfldtuple)
-        idwherestr =''
-        for index in range(idcount):
-            pkname = idfldtuple[index]
-            spkname = pkname
-            if operator.contains(pkname, table_name + '.'):
-                spkname = pkname.replace(table_name + '.', "", 1)
-            if maindbmeta.get_table_pk_qmneed(table_name, spkname):
-                idwherestr = idwherestr + "("+pkname+"='"+idtuple[index]+"')"
-            else:
-                idwherestr = idwherestr + "("+pkname+"="+idtuple[index]+")"
-            if index < idcount - 1:
-                idwherestr = idwherestr + " & "
-        if idcount > 1:
-            idwherestr = "(" + idwherestr + ")"
-        log.debug('delete_data_by_id() querystr: [%s]' % idwherestr)
-        return getattr(dataservice, 'delete_' + table_name.strip() + '_byid')(idwherestr)
+async def delete_data_by_id(table_name: str, id: str,
+                            idfield: str = Header(None, max_length=200),
+                            current_user_role: bool = True if services_model >= 2 else Depends(security.get_write_permission)):
+    """
+        Parameters
+        - **table_name** (path): **Required** - Name of the table to perform operations on.
+        - **id** (path): **Required** - The id value of identifier ex:10 , for mutiple ids, use ex: 10-20-……
+        - **idfield** (header): - Comma-delimited list of the fields used as identifiers. ex: 'Customers.id,Customers.id2'
+    """
+    idfield = idfield if operator.contains(idfield, table_name + '.') else table_name + '.' + (
+            ',' + table_name + '.').join(idfield.split(','))
+    log.debug(
+        'Access \'/_table/{table_name}/{id}\' : run in delete_data_by_id(), input data table_name: [%s]' % table_name)
+    log.debug('id: [%s]' % id)
+    log.debug('idfield: [%s]' % idfield)
+    if not maindbmeta.check_table_schema(table_name):
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail='Table [ %s ] not found' % table_name
+        )
+    dataservicemodel = importlib.import_module('services.' + table_name.strip().lower() + 'service')
+    dataservice = getattr(dataservicemodel, table_name.strip() + 'Service')()
+    idfldtuple = tuple(filter(None, idfield.replace(' ', '').split(',')))
+    idtuple = tuple(filter(None, id.replace(' ', '').split('-')))
+    idcount = len(idfldtuple)
+    idwherestr = ''
+    for index in range(idcount):
+        pkname = idfldtuple[index]
+        spkname = pkname
+        if operator.contains(pkname, table_name + '.'):
+            spkname = pkname.replace(table_name + '.', "", 1)
+        if maindbmeta.get_table_pk_qmneed(table_name, spkname):
+            idwherestr = idwherestr + "(" + pkname + "='" + idtuple[index] + "')"
+        else:
+            idwherestr = idwherestr + "(" + pkname + "=" + idtuple[index] + ")"
+        if index < idcount - 1:
+            idwherestr = idwherestr + " & "
+    if idcount > 1:
+        idwherestr = "(" + idwherestr + ")"
+    log.debug('delete_data_by_id() querystr: [%s]' % idwherestr)
+    return getattr(dataservice, 'delete_' + table_name.strip() + '_byid')(idwherestr)
 
 @app.get("/sys/config",
          tags=["System"],
