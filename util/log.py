@@ -24,10 +24,10 @@ log.add(LOG_PATH,
             enqueue=True)
 
 if __name__ == '__main__':
-    '''log.success('[测试log] hello, world')
+    log.success('[测试log] hello, world')
     log.info('[测试log] hello, world')
     log.debug('[测试log] hello, world')
     log.warning('[测试log] hello, world')
     log.error('[测试log] hello, world')
     log.critical('[测试log] hello, world')
-    log.exception('[测试log] hello, world')'''
+    log.exception('[测试log] hello, world')
