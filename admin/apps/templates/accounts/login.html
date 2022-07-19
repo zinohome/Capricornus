@@ -17,7 +17,7 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
   <!-- Carbon Theme style -->
-  <link rel="stylesheet" href="/static/assets/css/carbon-components.min.css">
+  <link rel="stylesheet" href="/static/assets/carbon-components/css/carbon-components.css">
 
 {% endblock stylesheets %}
 
@@ -47,33 +47,25 @@
           {{ form.hidden_tag() }}
 
           <div class="input-group mb-3">
-            {{ form.username(placeholder="Username", class="form-control") }}
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-envelope"></span>
-              </div>
-            </div>
+            {{ form.username(placeholder="Username", class="bx--text-input bx--text-input--light") }}
           </div>
+
           <div class="input-group mb-3">
-            {{ form.password(placeholder="Password", class="form-control", type="password") }}
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-lock"></span>
-              </div>
-            </div>
+            {{ form.password(placeholder="Password", class="bx--text-input bx--text-input--light", type="password") }}
           </div>
+
           <div class="row">
-            <div class="col-8">
+            <div class="col-6">
               <div class="icheck-primary">
-                <input type="checkbox" id="remember">
-                <label for="remember">
-                  Remember Me
-                </label>
+                <div class="bx--form-item bx--checkbox-wrapper">
+                  <input id="remember" class="bx--checkbox" type="checkbox" value="remember" name="remember">
+                  <label for="remember" class="bx--checkbox-label">Remember Me</label>
+                </div>
               </div>
             </div>
             <!-- /.col -->
-            <div class="col-4">
-              <button type="submit" name="login" class="btn btn-primary btn-block">Sign In</button>
+            <div class="col-6">
+              <button type="submit" name="login" class="bx--btn bx--btn--primary">Sign In</button>
             </div>
             <!-- /.col -->
           </div>
@@ -97,5 +89,7 @@
   <script src="/static/assets/plugins/jquery/jquery.min.js"></script>
   <!-- Bootstrap 4 -->
   <script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- carbon -->
+  <script src="/static/assets/carbon-components/scripts/carbon-components.js"></script>
 
 {% endblock javascripts %}
