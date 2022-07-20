@@ -9,7 +9,7 @@
 #  @Email   : ibmzhangjun@139.com
 #  @Software: Capricornus
 import collections
-import distutils
+
 import traceback
 
 import simplejson as json

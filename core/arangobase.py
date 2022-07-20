@@ -8,7 +8,7 @@
 #  @Author  : Zhang Jun
 #  @Email   : ibmzhangjun@139.com
 #  @Software: Capricornus
-import distutils
+
 import traceback
 
 from arango import ArangoClient

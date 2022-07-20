@@ -11,7 +11,7 @@
 
 import ast
 import collections
-import distutils
+
 import traceback
 
 import simplejson as json

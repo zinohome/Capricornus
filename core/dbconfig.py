@@ -8,7 +8,7 @@
 #  @Author  : Zhang Jun
 #  @Email   : ibmzhangjun@139.com
 #  @Software: Capricornus
-import distutils
+
 import traceback
 from datetime import date
 
@@ -269,6 +269,5 @@ if __name__ == '__main__':
     log.debug(list(configindb.__dict__.keys()))
     log.debug(configindb.cfgjson)
     log.debug(configindb.Database_Config.keys())
-    log.debug(dir(distutils.util))
 
 

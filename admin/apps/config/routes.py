@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import distutils
+
 
 from flask import render_template, request, redirect, session
 from flask_login import login_required
