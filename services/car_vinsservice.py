@@ -230,7 +230,7 @@ class Car_VinsService(object):
             textclauststr = "SELECT "
             #distinct
             bdistinct = queryjson['distinct'] if 'distinct' in queryjson else None
-            if bdistinct is not None and distutils.util.strtobool(str(bdistinct)):
+            if bdistinct is not None and (str(bdistinct).strip().lower() == 'true'):
                 textclauststr = textclauststr + "DISTINCT "
             # field + from
             textclauststr = textclauststr + queryfields + " FROM " + tablename
@@ -270,11 +270,11 @@ class Car_VinsService(object):
             record_count = 0
             # include_count
             binclude_count = queryjson['include_count'] if 'include_count' in queryjson else None
-            if binclude_count is not None and distutils.util.strtobool(str(binclude_count)):
+            if binclude_count is not None and (str(binclude_count).strip().lower() == 'true'):
                 include_count = True
             # count_only
             bcount_only = queryjson['count_only'] if 'count_only' in queryjson else None
-            if bcount_only is not None and distutils.util.strtobool(str(bcount_only)):
+            if bcount_only is not None and (str(bcount_only).strip().lower() == 'true'):
                 count_only = True
             try:
                 engine = dbengine.DBEngine().connect()
@@ -289,7 +289,7 @@ class Car_VinsService(object):
                             cqueryfields = "count(" + qfields.split(',')[0] + ") as rowcount"
                         counttextclauststr = "SELECT "
                         # distinct
-                        if bdistinct is not None and distutils.util.strtobool(str(bdistinct)):
+                        if bdistinct is not None and (str(bdistinct).strip().lower() == 'true'):
                             counttextclauststr = counttextclauststr + "DISTINCT "
                         # field + from
                         counttextclauststr = counttextclauststr + cqueryfields + " FROM " + tablename
